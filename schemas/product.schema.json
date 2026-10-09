@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/web4hub/web4-browser/main/schemas/product.schema.json",
+  "title": "Web4 Product",
+  "description": "Validation contract for product records used by Web4 Browser integrations.",
+  "type": "object",
+  "properties": {
+    "productId": {
+      "description": "Unique identifier for a product.",
+      "type": "integer"
+    },
+    "productName": {
+      "description": "Display name of the product.",
+      "type": "string"
+    },
+    "price": {
+      "description": "Product price; must be greater than zero.",
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "tags": {
+      "description": "Unique labels associated with the product.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "dimensions": {
+      "description": "Physical dimensions of the product.",
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "length",
+        "width",
+        "height"
+      ]
+    },
+    "warehouseLocation": {
+      "description": "Geographic coordinates for the warehouse holding the product.",
+      "$ref": "./geographical-location.schema.json"
+    }
+  },
+  "required": [
+    "productId",
+    "productName",
+    "price"
+  ]
+}
