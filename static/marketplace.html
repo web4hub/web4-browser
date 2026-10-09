@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Web4 intent-centric token marketplace demo with isolated profile ledgers and transparent simulated settlement.">
+  <title>Web4 Sovereign Exchange · Intent Matrix</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root{--glow:#00f2fe;--agent:#b56cff;--surface:#08090c;--panel:#111318;--card:#171a21;--line:#282d39;--muted:#929aaa}
+    *{box-sizing:border-box} body{margin:0;background:var(--surface);color:#f4f6fb;font-family:Inter,system-ui,-apple-system,sans-serif;min-height:100vh}
+    .topbar{background:var(--panel);border-bottom:1px solid var(--line)} .brand{font-weight:850;letter-spacing:.02em;background:linear-gradient(90deg,var(--glow),var(--agent));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .workspace{min-height:calc(100vh - 64px)} .sidebar{width:330px;flex:0 0 330px;background:var(--panel);border-right:1px solid var(--line)}
+    .canvas{min-width:0;flex:1;background:#0a0b10} .panel{background:rgba(23,26,33,.86);border:1px solid var(--line);border-radius:14px}
+    .asset-card{background:var(--card);border:1px solid var(--line);transition:border-color .2s} .asset-card:hover{border-color:var(--glow)}
+    .terminal{background:#050608;border:1px solid var(--line);border-radius:9px;color:#b9c5d3;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;height:150px;overflow:auto;white-space:pre-wrap}
+    .eyebrow{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:750}
+    .metric{background:#0b0d12;border:1px solid var(--line);border-radius:10px;padding:14px;height:100%}
+    .mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace} .text-agent{color:var(--agent)} .text-glow{color:var(--glow)}
+    .form-control,.form-select{background-color:#090b10;border-color:#343a49;color:#f4f6fb}.form-control:focus,.form-select:focus{background:#090b10;color:#fff;border-color:var(--glow);box-shadow:0 0 0 .2rem #00f2fe20}
+    .table{--bs-table-bg:transparent;--bs-table-color:#e7eaf0;--bs-table-hover-bg:#ffffff08;--bs-table-border-color:var(--line)} .table thead th{font-size:.69rem;letter-spacing:.08em;color:var(--muted);white-space:nowrap}
+    .proof{overflow-wrap:anywhere;font-size:.76rem}.pill{border:1px solid var(--line);border-radius:999px;padding:.25rem .6rem;font-size:.72rem}
+    .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#ffc857;margin-right:6px}
+    .notice{font-size:.78rem;color:#c6cedb;background:#10131a;border:1px solid var(--line);border-radius:9px;padding:10px}
+    @media(max-width:900px){.workspace{display:block!important}.sidebar{width:100%;border-right:0;border-bottom:1px solid var(--line)}.canvas{padding:1rem!important}.terminal{height:110px}}
+    @media(min-width:901px){.workspace{height:calc(100vh - 64px)}.sidebar{overflow:auto}.canvas{overflow:auto}}
+  </style>
+</head>
+<body>
+<header class="topbar px-3 px-lg-4 py-3">
+  <div class="d-flex align-items-center justify-content-between gap-3">
+    <a class="text-decoration-none brand fs-6" href="./index.html"><i class="bi bi-cpu-fill me-2"></i>WEB4 <span class="d-none d-sm-inline">// SOVEREIGN INTENT EXCHANGE</span></a>
+    <div class="d-flex align-items-center gap-2">
+      <span class="pill text-secondary d-none d-md-inline"><i class="bi bi-shield-check me-1"></i>Local demo · no chain connection</span>
+      <div class="rounded-circle d-grid place-items-center" style="width:34px;height:34px;background:linear-gradient(135deg,#00f2fe,#aa33ff)"></div>
+      <div class="lh-sm"><div class="small fw-bold">Sovereign Profile</div><div class="mono text-secondary" style="font-size:10px" id="identityLabel">did:w4:trader:88ba</div></div>
+    </div>
+  </div>
+</header>
+<div class="workspace d-flex">
+  <aside class="sidebar p-3 d-flex flex-column gap-3">
+    <div>
+      <label for="traderProfile" class="eyebrow mb-2">Active identity context</label>
+      <select class="form-select form-select-sm" id="traderProfile">
+        <option value="personal">Personal Core · did:w4:trader:88ba</option>
+        <option value="zk-shadow">Private Shadow · did:w4:blind:301x</option>
+      </select>
+      <div class="text-secondary mt-2" style="font-size:.75rem">Demo profiles use separate in-memory balances. Switching context never moves assets between profiles.</div>
+    </div>
+    <section class="panel p-3">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <div class="eyebrow text-agent"><i class="bi bi-robot me-1"></i>Intent agent</div>
+        <span class="pill text-agent">Matcher · simulated</span>
+      </div>
+      <p class="text-secondary mb-2" style="font-size:.76rem">Explore a possible route and estimate slippage. No external agent, router, wallet, or blockchain is contacted.</p>
+      <div class="terminal p-2 mb-2" id="marketTerminal" role="log" aria-live="polite">[SYSTEM] Demo ready. Create an intent to begin.</div>
+      <button type="button" class="btn btn-sm btn-outline-info w-100" id="discoverBtn"><i class="bi bi-lightning-charge-fill me-1"></i>Discover simulated route</button>
+    </section>
+    <section>
+      <div class="eyebrow mb-2">Sovereign vault · demo balances</div>
+      <div class="d-flex flex-column gap-2" id="vaultBalances"></div>
+    </section>
+    <section class="panel p-3">
+      <div class="eyebrow mb-2">Privacy proof status</div>
+      <div class="d-flex align-items-center gap-2 mb-2"><i class="bi bi-shield-lock text-agent fs-5"></i><strong class="small">Proof preview</strong><span class="pill ms-auto text-warning">Mock</span></div>
+      <p class="text-secondary mb-2" style="font-size:.75rem">This panel creates a demo fingerprint for display only. It is not a zero-knowledge proof and does not establish privacy or transaction validity.</p>
+      <div class="proof mono text-glow" id="proofValue">No intent selected</div>
+    </section>
+  </aside>
+  <main class="canvas p-3 p-xl-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+      <div><div class="eyebrow mb-1">Web4 · Intent-centric exchange</div><h1 class="h4 mb-1">Token Intent Matrix</h1><p class="text-secondary mb-0 small">Describe the outcome. Review constraints. Approve the demo intent. Settlement is simulated.</p></div>
+      <span class="pill text-info"><i class="bi bi-diagram-3 me-1"></i>Intent pipeline</span>
+    </div>
+    <div class="row g-3 mb-3">
+      <div class="col-xl-4 col-lg-5">
+        <section class="panel p-3 h-100">
+          <h2 class="h6 mb-3"><i class="bi bi-arrow-left-right text-info me-2"></i>Compose trade intent</h2>
+          <form id="intentForm">
+            <div class="mb-3"><label for="tradeDirection" class="form-label small text-secondary">Intent direction</label><select class="form-select" id="tradeDirection"><option value="BUY">Acquire selected asset</option><option value="SELL">Offer selected asset</option></select></div>
+            <div class="mb-3"><label for="tradeToken" class="form-label small text-secondary">Asset</label><select class="form-select" id="tradeToken"><option value="W4">W4 · Native utility token</option><option value="WETH">WETH · Wrapped Ether (demo)</option><option value="ZKP">ZKP · Privacy utility (demo)</option></select></div>
+            <div class="mb-3"><label for="tradeAmount" class="form-label small text-secondary">Quantity</label><input class="form-control mono" id="tradeAmount" type="number" min="0.000001" step="any" value="10" required><div class="form-text">Must be greater than zero and within the demo profile's available balance for sells.</div></div>
+            <div class="mb-3"><div class="d-flex justify-content-between align-items-center"><label for="maxSlippage" class="form-label small text-secondary mb-1">Maximum slippage</label><strong class="mono small" id="slippageLabel">0.50%</strong></div><input class="form-range" id="maxSlippage" type="range" min="0.1" max="5" step="0.1" value="0.5"><div class="d-flex justify-content-between text-secondary" style="font-size:.7rem"><span>0.1%</span><span>5.0%</span></div></div>
+            <div class="notice mb-3" id="tradePreview">Estimated notional: $12.40 · Demo estimate only.</div>
+            <button class="btn btn-info w-100 fw-bold" type="submit"><i class="bi bi-file-earmark-check me-1"></i>Create intent for review</button>
+          </form>
+          <div class="d-grid mt-2"><button class="btn btn-outline-secondary btn-sm" type="button" id="resetDemo">Reset demo data</button></div>
+        </section>
+      </div>
+      <div class="col-xl-8 col-lg-7">
+        <section class="panel p-3 h-100">
+          <div class="d-flex justify-content-between align-items-center gap-2 mb-3"><h2 class="h6 mb-0"><i class="bi bi-activity text-warning me-2"></i>Indicative token indices</h2><span class="pill text-secondary">Static sample prices</span></div>
+          <div class="row g-3" id="marketIndices"></div>
+          <div class="notice mt-3"><i class="bi bi-info-circle me-1"></i>Prices and balances are hard-coded demonstration data, not live market data, financial advice, or a quote from a liquidity provider.</div>
+        </section>
+      </div>
+    </div>
+    <section class="panel p-3 mb-3">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><div><h2 class="h6 mb-1"><i class="bi bi-list-check text-info me-2"></i>Intent pipeline</h2><div class="text-secondary small">Review before simulated settlement. Pending intents do not alter balances.</div></div><span class="pill" id="intentCount">0 intents</span></div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead><tr><th>INTENT ID</th><th>PROFILE</th><th>ASSET / SIDE</th><th>QUANTITY</th><th>EST. VALUE</th><th>STATUS</th><th>ACTION</th></tr></thead>
+          <tbody id="intentTableBody"><tr><td colspan="7" class="text-secondary text-center py-4">No intents yet. Compose one above.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="panel p-3">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2"><h2 class="h6 mb-0"><i class="bi bi-clock-history text-info me-2"></i>Activity log</h2><span class="pill text-warning">Local only</span></div>
+      <div class="terminal p-3" id="activityLog" style="height:105px">[SYSTEM] UI initialized. No wallet connected.</div>
+    </section>
+    <footer class="text-secondary small py-3">Web4 Browser · Sovereign exchange prototype · No real signing, proof generation, order routing, or blockchain settlement is implemented.</footer>
+  </main>
+</div>
+<script>
+(function(){
+  "use strict";
+  const initialVault = {
+    W4:{balance:2500,price:1.24,prefix:"⎔"},
+    WETH:{balance:4.12,price:2840.50,prefix:"Ξ"},
+    ZKP:{balance:140,price:8.75,prefix:"🛡"}
+  };
+  const cloneVault = () => JSON.parse(JSON.stringify(initialVault));
+  const profiles = {
+    personal:{label:"did:w4:trader:88ba",vault:cloneVault()},
+    "zk-shadow":{label:"did:w4:blind:301x",vault:{W4:{balance:180,price:1.24,prefix:"⎔"},WETH:{balance:0.35,price:2840.50,prefix:"Ξ"},ZKP:{balance:42,price:8.75,prefix:"🛡"}}}
+  };
+  const seedIntents = [
+    {id:"w4-intent-77a",profile:"personal",asset:"W4",dir:"BUY",qty:500,state:"Matching",slippage:0.5},
+    {id:"w4-intent-12f",profile:"personal",asset:"ZKP",dir:"SELL",qty:25,state:"Awaiting Approval",slippage:0.5},
+    {id:"w4-intent-90c",profile:"zk-shadow",asset:"WETH",dir:"BUY",qty:1.5,state:"Settled (simulated)",slippage:0.5}
+  ];
+  let intents = seedIntents.map(x=>({...x}));
+  let selectedIntentId = null;
+  let idCounter = 100;
+  const $ = id => document.getElementById(id);
+  const profileKey = () => $("traderProfile").value;
+  const vault = () => profiles[profileKey()].vault;
+  const token = symbol => vault()[symbol];
+  const money = n => new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(n);
+  const qty = n => Number(n).toLocaleString("en-US",{maximumFractionDigits:6});
+  const escapeHtml = value => String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  function log(message){
+    const line = document.createElement("div");
+    line.textContent = "["+new Date().toLocaleTimeString()+"] "+message;
+    $("activityLog").appendChild(line);
+    $("activityLog").scrollTop = $("activityLog").scrollHeight;
+  }
+  function terminal(message){
+    const line = document.createElement("div");
+    line.textContent = message;
+    $("marketTerminal").appendChild(line);
+    $("marketTerminal").scrollTop = $("marketTerminal").scrollHeight;
+  }
+  function currentProfileName(key){return key==="personal"?"Personal Core":"Private Shadow";}
+  function renderVault(){
+    const target=$("vaultBalances"); target.replaceChildren();
+    Object.entries(vault()).forEach(([symbol,item])=>{
+      const card=document.createElement("div"); card.className="asset-card rounded p-2 d-flex align-items-center justify-content-between gap-2";
+      const left=document.createElement("div");
+      const name=document.createElement("div"); name.className="small fw-bold mono"; name.textContent=item.prefix+" "+symbol;
+      const value=document.createElement("div"); value.className="text-secondary mono"; value.style.fontSize="10px"; value.textContent="Value: "+money(item.balance*item.price);
+      left.append(name,value);
+      const balance=document.createElement("span"); balance.className="badge text-bg-dark border border-secondary mono"; balance.textContent=qty(item.balance);
+      card.append(left,balance); target.appendChild(card);
+    });
+  }
+  function renderIndices(){
+    const target=$("marketIndices"); target.replaceChildren();
+    Object.entries(initialVault).forEach(([symbol,item])=>{
+      const col=document.createElement("div"); col.className="col-md-4";
+      const metric=document.createElement("div"); metric.className="metric";
+      const label=document.createElement("div"); label.className="eyebrow mono"; label.textContent=symbol+" / USD";
+      const price=document.createElement("div"); price.className="h4 mono my-2"; price.textContent=money(item.price);
+      const caption=document.createElement("div"); caption.className="text-secondary small"; caption.textContent="Sample reference price";
+      metric.append(label,price,caption); col.appendChild(metric); target.appendChild(col);
+    });
+  }
+  function statusClass(state){
+    if(state==="Settled (simulated)")return "text-success border-success";
+    if(state==="Failed"||state==="Cancelled")return "text-secondary border-secondary";
+    if(state==="Awaiting Approval")return "text-info border-info";
+    return "text-warning border-warning";
+  }
+  function renderIntents(){
+    const body=$("intentTableBody"); body.replaceChildren();
+    $("intentCount").textContent=intents.length+" intent"+(intents.length===1?"":"s");
+    const visible=intents.filter(i=>i.profile===profileKey());
+    if(!visible.length){const tr=document.createElement("tr");const td=document.createElement("td");td.colSpan=7;td.className="text-secondary text-center py-4";td.textContent="No intents for this profile.";tr.appendChild(td);body.appendChild(tr);return;}
+    visible.forEach(intent=>{
+      const tr=document.createElement("tr");
+      const values=[intent.id,currentProfileName(intent.profile),intent.asset+" / "+intent.dir,qty(intent.qty),money(intent.qty*initialVault[intent.asset].price)];
+      values.forEach((value,index)=>{const td=document.createElement("td");td.textContent=value;if(index===0)td.className="mono small";tr.appendChild(td);});
+      const status=document.createElement("td");const pill=document.createElement("span");pill.className="pill "+statusClass(intent.state);pill.textContent=intent.state;status.appendChild(pill);tr.appendChild(status);
+      const actions=document.createElement("td");actions.className="text-nowrap";
+      if(intent.state==="Awaiting Approval"){
+        const approve=document.createElement("button");approve.type="button";approve.className="btn btn-sm btn-outline-success me-1";approve.textContent="Approve demo";approve.addEventListener("click",()=>settleIntent(intent.id));actions.appendChild(approve);
+        const cancel=document.createElement("button");cancel.type="button";cancel.className="btn btn-sm btn-outline-secondary";cancel.textContent="Cancel";cancel.addEventListener("click",()=>cancelIntent(intent.id));actions.appendChild(cancel);
+      }else if(intent.state==="Matching"){
+        const review=document.createElement("button");review.type="button";review.className="btn btn-sm btn-outline-info";review.textContent="Review";review.addEventListener("click",()=>reviewIntent(intent.id));actions.appendChild(review);
+      }else{
+        const view=document.createElement("button");view.type="button";view.className="btn btn-sm btn-outline-secondary";view.textContent="Proof preview";view.addEventListener("click",()=>showProof(intent));actions.appendChild(view);
+      }
+      tr.appendChild(actions);body.appendChild(tr);
+    });
+  }
+  function refresh(){ $("identityLabel").textContent=profiles[profileKey()].label;renderVault();renderIndices();renderIntents();updatePreview(); }
+  function updatePreview(){
+    const symbol=$("tradeToken").value;const amount=Number($("tradeAmount").value)||0;const slippage=Number($("maxSlippage").value)||0;
+    $("slippageLabel").textContent=slippage.toFixed(1)+"%";
+    $("tradePreview").textContent="Estimated notional: "+money(amount*initialVault[symbol].price)+" · Max slippage: "+slippage.toFixed(1)+"% · Demo estimate only.";
+  }
+  function makeId(){idCounter+=1;return "w4-intent-"+idCounter.toString(36)+"-"+Math.random().toString(36).slice(2,6);}
+  function showProof(intent){
+    selectedIntentId=intent.id;
+    const source=[intent.id,intent.profile,intent.asset,intent.dir,String(intent.qty),intent.state].join("|");
+    let hash=2166136261;for(let i=0;i<source.length;i++){hash^=source.charCodeAt(i);hash=Math.imul(hash,16777619);}
+    $("proofValue").textContent="DEMO-FP-"+(hash>>>0).toString(16).padStart(8,"0").toUpperCase()+" · NOT A ZK PROOF";
+    log("Displayed mock fingerprint for "+intent.id+"; no cryptographic proof was generated.");
+  }
+  function createIntent(event){
+    event.preventDefault();
+    const direction=$("tradeDirection").value,symbol=$("tradeToken").value,amount=Number($("tradeAmount").value),slippage=Number($("maxSlippage").value);
+    if(!Number.isFinite(amount)||amount<=0){alert("Enter a quantity greater than zero.");return;}
+    if(!initialVault[symbol]){alert("Select a supported demo asset.");return;}
+    if(direction==="SELL"&&token(symbol).balance<amount){alert("Insufficient demo balance in the active profile.");return;}
+    const intent={id:makeId(),profile:profileKey(),asset:symbol,dir:direction,qty:amount,state:"Awaiting Approval",slippage};
+    intents.unshift(intent);selectedIntentId=intent.id;
+    terminal("[INTENT] "+intent.id+" created for review; balances unchanged.");
+    log("Created "+direction+" intent for "+qty(amount)+" "+symbol+" in "+currentProfileName(intent.profile)+". No funds moved.");
+    showProof(intent);refresh();
+  }
+  function reviewIntent(id){
+    const intent=intents.find(i=>i.id===id);if(!intent||intent.state!=="Matching")return;
+    intent.state="Awaiting Approval";terminal("[MATCHER] Demo route proposed. Approval required; no external router was contacted.");
+    log("Intent "+id+" moved to Awaiting Approval.");refresh();
+  }
+  function settleIntent(id){
+    const intent=intents.find(i=>i.id===id);if(!intent||intent.profile!==profileKey()||intent.state!=="Awaiting Approval")return;
+    const activeVault=profiles[intent.profile].vault;
+    const amount=intent.qty,symbol=intent.asset,price=initialVault[symbol].price;
+    if(intent.dir==="SELL"&&activeVault[symbol].balance<amount){intent.state="Failed";log("Intent "+id+" failed: insufficient balance at approval.");refresh();return;}
+    const estimatedImpact=amount*price*(intent.slippage/100);
+    if(intent.dir==="SELL"){activeVault[symbol].balance-=amount;activeVault.W4.balance+=amount*price/initialVault.W4.price;}
+    else{
+      const costInW4=amount*price/initialVault.W4.price;
+      if(activeVault.W4.balance<costInW4){alert("Not enough W4 demo balance to cover the estimated purchase value.");return;}
+      activeVault.W4.balance-=costInW4;activeVault[symbol].balance+=amount;
+    }
+    intent.state="Settled (simulated)";intent.demoImpact=estimatedImpact;
+    terminal("[SETTLEMENT] "+id+" marked settled in local simulation only.");
+    log("Simulated settlement for "+id+". Estimated slippage allowance: "+money(estimatedImpact)+". No blockchain transaction occurred.");
+    showProof(intent);refresh();
+  }
+  function cancelIntent(id){
+    const intent=intents.find(i=>i.id===id);if(!intent||intent.profile!==profileKey()||intent.state!=="Awaiting Approval")return;
+    intent.state="Cancelled";terminal("[INTENT] "+id+" cancelled; balances unchanged.");log("Cancelled "+id+".");refresh();
+  }
+  function discoverRoute(){
+    terminal("[AGENT] Inspecting bundled sample prices and intent constraints...");
+    const btn=$("discoverBtn");btn.disabled=true;
+    window.setTimeout(()=>{
+      terminal("[AGENT] Candidate route found in static demo data.");
+      terminal("[AGENT] No live liquidity, external MCP agent, or chain has been queried.");
+      const pending=intents.find(i=>i.profile===profileKey()&&i.state==="Awaiting Approval");
+      if(pending){pending.state="Matching";terminal("[INTENT] "+pending.id+" moved to Matching. Review it before approval.");refresh();}
+      log("Completed local route-discovery simulation.");btn.disabled=false;
+    },450);
+  }
+  function resetDemo(){
+    if(!window.confirm("Reset all demo profile balances and intent history?"))return;
+    Object.keys(profiles).forEach(key=>profiles[key].vault=key==="personal"?cloneVault():{W4:{balance:180,price:1.24,prefix:"⎔"},WETH:{balance:.35,price:2840.50,prefix:"Ξ"},ZKP:{balance:42,price:8.75,prefix:"🛡"}});
+    intents=seedIntents.map(x=>({...x}));selectedIntentId=null;$("marketTerminal").textContent="[SYSTEM] Demo reset."; $("activityLog").textContent="[SYSTEM] Demo data reset. No wallet connected.";$("proofValue").textContent="No intent selected";refresh();
+  }
+  $("intentForm").addEventListener("submit",createIntent);
+  $("traderProfile").addEventListener("change",()=>{terminal("[SYSTEM] Switched profile context to "+profileKey()+".");$("proofValue").textContent="Select an intent to preview its demo fingerprint.";refresh();});
+  $("tradeToken").addEventListener("change",updatePreview);$("tradeAmount").addEventListener("input",updatePreview);$("maxSlippage").addEventListener("input",updatePreview);
+  $("discoverBtn").addEventListener("click",discoverRoute);$("resetDemo").addEventListener("click",resetDemo);
+  refresh();
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
