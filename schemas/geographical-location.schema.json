@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/web4hub/web4-browser/main/schemas/geographical-location.schema.json",
+  "title": "Geographical Location",
+  "description": "Latitude and longitude coordinates for a physical location.",
+  "type": "object",
+  "properties": {
+    "latitude": {
+      "type": "number",
+      "minimum": -90,
+      "maximum": 90
+    },
+    "longitude": {
+      "type": "number",
+      "minimum": -180,
+      "maximum": 180
+    }
+  },
+  "required": [
+    "latitude",
+    "longitude"
+  ],
+  "additionalProperties": false
+}
