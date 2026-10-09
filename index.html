@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web4Browser Pro WebApp</title>
+    <style>
+        :root {
+            --bg-color: #202124;
+            --toolbar-color: #2f3033;
+            --text-color: #ffffff;
+            --input-bg: #202124;
+            --tab-active: #2f3033;
+            --tab-inactive: #1e1f22;
+            --sidebar-bg: #252629;
+            --border-color: #121212;
+            --invert-filter: invert(0);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f1f3f4;
+            --toolbar-color: #ffffff;
+            --text-color: #3c4043;
+            --input-bg: #f1f3f4;
+            --tab-active: #ffffff;
+            --tab-inactive: #dee1e6;
+            --sidebar-bg: #f8f9fa;
+            --border-color: #chchch;
+            --invert-filter: invert(0);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Tabs Bar */
+        .tabs-bar {
+            background-color: var(--tab-inactive);
+            display: flex;
+            align-items: flex-end;
+            padding: 8px 8px 0 8px;
+            gap: 4px;
+        }
+
+        .tab {
+            background-color: var(--tab-inactive);
+            padding: 8px 16px;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 150px;
+            min-width: 100px;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border: none;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .tab.active {
+            background-color: var(--tab-active);
+            opacity: 1;
+        }
+
+        .tab .close-tab {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .new-tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+            margin-bottom: 4px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background-color: var(--toolbar-color);
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .address-bar {
+            flex-grow: 1;
+            background-color: var(--input-bg);
+            border: 1px solid transparent;
+            outline: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        /* Workspace Grid (Sidebar + Viewport) */
+        .workspace {
+            display: flex;
+            flex-grow: 1;
+            height: calc(100vh - 84px);
+        }
+
+        /* Sidebar Bookmarks */
+        .sidebar {
+            width: 220px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bookmark-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+        }
+
+        .bookmark-item {
+            padding: 6px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bookmark-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Browser Content Viewport */
+        .content-viewport {
+            flex-grow: 1;
+            background-color: #ffffff;
+            position: relative;
+        }
+
+        .browser-page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            border: none;
+        }
+
+        .browser-page.active {
+            display: block;
+        }
+
+        /* Proxy/Iframe layout container */
+        .frame-wrapper {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Home View Custom Look */
+        .home-screen {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .logo {
+            font-size: 44px;
+            font-weight: bold;
+            margin-bottom: 24px;
+            background: linear-gradient(45deg, #4285f4, #ea4335, #fbbc05, #34a853);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-box {
+            width: 80%;
+            max-width: 580px;
+            padding: 12px 20px;
+            border-radius: 24px;
+            border: 1px solid #5f6368;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Tabs Container -->
+    <div class="tabs-bar" id="tabsBar">
+        <button class="new-tab-btn" onclick="createNewTab()">+</button>
+    </div>
+
+    <!-- Navigation & Address Bar -->
+    <div class="toolbar">
+        <button class="nav-btn" onclick="alert('Simulated back')">⟵</button>
+        <button class="nav-btn" onclick="alert('Simulated forward')">⟶</button>
+        <button class="nav-btn" onclick="refreshPage()">↻</button>
+        <input type="text" class="address-bar" id="addressBar" placeholder="Search DuckDuckGo or enter URL" onkeydown="handleUrlInput(event)">
+        <button class="nav-btn" title="Add Bookmark" onclick="addCurrentAsBookmark()">⭐</button>
+        <button class="nav-btn" id="themeToggle" onclick="toggleTheme()">☀️</button>
+    </div>
+
+    <!-- Layout Grid -->
+    <div class="workspace">
+        <!-- Persistent Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-title">
+                <span>Bookmarks</span>
+            </div>
+            <ul class="bookmark-list" id="bookmarkList">
+                <li class="bookmark-item" onclick="navigateTab(activeTabId, 'wikipedia.org')">🌐 Wikipedia</li>
+                <li class="bookmark-item" onclick="navigateTab(activeTabId, 'archive.org')">🏛️ Internet Archive</li>
+            </ul>
+        </div>
+
+        <!-- Main Display Window -->
+        <div class="content-viewport" id="viewport"></div>
+    </div>
+
+    <script>
+        let tabs = [];
+        let activeTabId = null;
+        let isDarkMode = true;
+
+        window.onload = () => {
+            createNewTab();
+        };
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+            document.getElementById('themeToggle').innerText = isDarkMode ? '☀️' : '🌙';
+        }
+
+        function createNewTab() {
+            const tabId = 'tab-' + Date.now();
+            
+            const tabButton = document.createElement('button');
+            tabButton.className = 'tab';
+            tabButton.id = `btn-${tabId}`;
+            tabButton.onclick = () => switchTab(tabId);
+            tabButton.innerHTML = `
+                <span class="tab-title">New Tab</span>
+                <span class="close-tab" onclick="closeTab(event, '${tabId}')">×</span>
+            `;
+
+            const tabsBar = document.getElementById('tabsBar');
+            tabsBar.insertBefore(tabButton, tabsBar.lastElementChild);
+
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'browser-page';
+            pageDiv.id = `page-${tabId}`;
+            pageDiv.innerHTML = `
+                <div class="home-screen">
+                    <div class="logo">Web4Browser</div>
+                    <input type="text" class="search-box" placeholder="Search engine or type address..." onkeydown="handleHomeSearch(event, '${tabId}')">
+                </div>
+            `;
+            document.getElementById('viewport').appendChild(pageDiv);
+
+            tabs.push({ id: tabId, url: 'home' });
+            switchTab(tabId);
+        }
+
+        function switchTab(tabId) {
+            activeTabId = tabId;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.browser-page').forEach(p => p.classList.remove('active'));
+
+            const currentTab = document.getElementById(`btn-${tabId}`);
+            const currentPage = document.getElementById(`page-${tabId}`);
+            
+
+if(currentTab) currentTab.classList.add('active');
+if(currentPage) currentPage.classList.add('active');
+const tabData = tabs.find(t => t.id === tabId);
+const addressBar = document.getElementById('addressBar');
+if (tabData) {
+addressBar.value = tabData.url === 'home' ? '' : tabData.url;
+}
+}
+function closeTab(event, tabId) {
+event.stopPropagation();
+tabs = tabs.filter(t => t.id !== tabId);
+document.getElementById(btn-${tabId}).remove();
+document.getElementById(page-${tabId}).remove();
+if (activeTabId === tabId && tabs.length > 0) {
+switchTab(tabs[tabs.length - 1].id);
+} else if (tabs.length === 0) {
+createNewTab();
+}
+}
+function navigateTab(tabId, targetUrl) {
+const tabData = tabs.find(t => t.id === tabId);
+const pageContainer = document.getElementById(page-${tabId});
+const tabButton = document.getElementById(btn-${tabId});
+let finalUrl = targetUrl;
+// 1. Check if input is a raw text search
+if (!targetUrl.includes('.') || targetUrl.includes(' ')) {
+finalUrl = https://duckduckgo.com{encodeURIComponent(targetUrl)}&html=1;
+tabButton.querySelector('.tab-title').innerText = targetUrl;
+} else {
+if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+targetUrl = 'https://' + targetUrl;
+}
+// 2. Iframe Proxy Bypass (Using an open-source reverse proxy layout renderer)
+finalUrl = https://allorigins.win{encodeURIComponent(targetUrl)};
+tabButton.querySelector('.tab-title').innerText = targetUrl.replace('https://','').replace('http://','');
+}
+tabData.url = targetUrl;
+pageContainer.innerHTML = <iframe class="frame-wrapper" src="${finalUrl}"></iframe>;
+if (activeTabId === tabId) {
+document.getElementById('addressBar').value = targetUrl;
+}
+}
+function handleUrlInput(e) {
+if (e.key === 'Enter' && activeTabId) {
+navigateTab(activeTabId, e.target.value);
+}
+}
+function handleHomeSearch(e, tabId) {
+if (e.key === 'Enter') {
+navigateTab(tabId, e.target.value);
+}
+}
+function addCurrentAsBookmark() {
+if(!activeTabId) return;
+const tabData = tabs.find(t => t.id === activeTabId);
+if(tabData && tabData.url !== 'home') {
+const list = document.getElementById('bookmarkList');
+const li = document.createElement('li');
+li.className = 'bookmark-item';
+li.innerText = 🔖 ${tabData.url.substring(0,25)};
+li.onclick = () => navigateTab(activeTabId, tabData.url);
+list.appendChild(li);
+}
+}
+function refreshPage() {
+if(activeTabId) {
+const pageContainer = document.getElementById(page-${activeTabId});
+const iframe = pageContainer.querySelector('iframe');
+if(iframe) iframe.src = iframe.src;
+}
+}
+
+
+
+### Key Added Features:
+* 🌗 **Theme Switcher**: Click the ☀️ / 🌙 icon on the toolbar to instantly toggle the UI between a dark design and light mode.
+* ⭐ **Dynamic Bookmarks Sidebar**: Keeps persistent links on the left side. Click the star button next to the address bar to add any page you are viewing to your active list.
+* 🛡️ **AllOrigins CORS Sandbox Bypass**: Standard websites block iframes using headers (`X-Frame-Options`). This code automatically wraps URLs using `api.allorigins.win` to route around limitations, giving your simulation enhanced site compatibility.
+
+<FollowUp>
+Would you like to extend this framework to include:
+* Storing your bookmarks in **localStorage** so they don't disappear when you refresh?
+* Adding a functional **Downloads panel** or **History tracker**?
+* Adding a **custom address bar dropdown** with auto-suggestions?
+</FollowUp>
+
+
