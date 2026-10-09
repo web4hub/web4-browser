@@ -29,6 +29,9 @@ jobs:
           import re
 
           required = {
+              "index.html": ["tabs", "navigateForm", "address", "back", "forward", "reload", "profileSelect"],
+              "static/marketplace.html": ["traderProfile", "intentForm", "tradeAmount", "intentTableBody", "activityLog"],
+              "static/workspace.html": ["nav", "authBtn", "profileForm", "aiForm", "pageForm", "chatForm", "radioForm", "podcastForm", "automationForm", "fxResult"],
               "index.html": ["tabs", "navigateForm", "address", "back", "forward", "reload", "profileSelect", "viewport"],
               "static/marketplace.html": ["traderProfile", "intentForm", "tradeAmount", "intentTableBody", "activityLog"],
           }

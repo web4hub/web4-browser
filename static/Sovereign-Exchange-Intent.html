@@ -11,7 +11,7 @@
   <style>
     :root{--glow:#00f2fe;--agent:#b56cff;--surface:#08090c;--panel:#111318;--card:#171a21;--line:#282d39;--muted:#929aaa}
     *{box-sizing:border-box} body{margin:0;background:var(--surface);color:#f4f6fb;font-family:Inter,system-ui,-apple-system,sans-serif;min-height:100vh}
-    .topbar{background:var(--panel);border-bottom:1px solid var(--line)} .brand{font-weight:850;letter-spacing:.02em;background:linear-gradient(90deg,var(--glow),var(--agent));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .topbar{background:var(--panel);border-bottom:1px solid var(--line)} .brand{font-weight:850;letter-spacing:.02em;background:linear-gradient(90deg,var(--glow),var(--agent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
     .workspace{min-height:calc(100vh - 64px)} .sidebar{width:330px;flex:0 0 330px;background:var(--panel);border-right:1px solid var(--line)}
     .canvas{min-width:0;flex:1;background:#0a0b10} .panel{background:rgba(23,26,33,.86);border:1px solid var(--line);border-radius:14px}
     .asset-card{background:var(--card);border:1px solid var(--line);transition:border-color .2s} .asset-card:hover{border-color:var(--glow)}
@@ -19,8 +19,8 @@
     .eyebrow{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:750}
     .metric{background:#0b0d12;border:1px solid var(--line);border-radius:10px;padding:14px;height:100%}
     .mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace} .text-agent{color:var(--agent)} .text-glow{color:var(--glow)}
-    .form-control,.form-select{background-color:#090b10;border-color:#343a49;color:#f4f6fb}.form-control:focus,.form-select:focus{background:#090b10;color:#fff;border-color:var(--glow);box-shadow:0 0 0 .2rem #00f2fe20}
-    .table{--bs-table-bg:transparent;--bs-table-color:#e7eaf0;--bs-table-hover-bg:#ffffff08;--bs-table-border-color:var(--line)} .table thead th{font-size:.69rem;letter-spacing:.08em;color:var(--muted);white-space:nowrap}
+    .form-control,.form-select{background-color:#090b10;border-color:#343a49;color:#f4f6fb}.form-control:focus,.form-select:focus{background:#090b10;color:#fff;border-color:var(--glow);box-shadow:0 0 0 .2rem rgba(0,242,254,.15)}
+    .table{--bs-table-bg:transparent;--bs-table-color:#e7eaf0;--bs-table-hover-bg:#ffffff08;--bs-table-border-color:var(--line)} .table thead th{font-size:.69rem;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
     .proof{overflow-wrap:anywhere;font-size:.76rem}.pill{border:1px solid var(--line);border-radius:999px;padding:.25rem .6rem;font-size:.72rem}
     .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#ffc857;margin-right:6px}
     .notice{font-size:.78rem;color:#c6cedb;background:#10131a;border:1px solid var(--line);border-radius:9px;padding:10px}
@@ -80,7 +80,7 @@
           <h2 class="h6 mb-3"><i class="bi bi-arrow-left-right text-info me-2"></i>Compose trade intent</h2>
           <form id="intentForm">
             <div class="mb-3"><label for="tradeDirection" class="form-label small text-secondary">Intent direction</label><select class="form-select" id="tradeDirection"><option value="BUY">Acquire selected asset</option><option value="SELL">Offer selected asset</option></select></div>
-            <div class="mb-3"><label for="tradeToken" class="form-label small text-secondary">Asset</label><select class="form-select" id="tradeToken"><option value="W4">W4 · Native utility token</option><option value="WETH">WETH · Wrapped Ether (demo)</option><option value="ZKP">ZKP · Privacy utility (demo)</option></select></div>
+            <div class="mb-3"><label for="tradeToken" class="form-label small text-secondary">Asset</label><select class="form-select" id="tradeToken"><option value="W4" disabled>W4 · Native utility token (quote asset)</option><option value="WETH" selected>WETH · Wrapped Ether (demo)</option><option value="ZKP">ZKP · Privacy utility (demo)</option></select></div>
             <div class="mb-3"><label for="tradeAmount" class="form-label small text-secondary">Quantity</label><input class="form-control mono" id="tradeAmount" type="number" min="0.000001" step="any" value="10" required><div class="form-text">Must be greater than zero and within the demo profile's available balance for sells.</div></div>
             <div class="mb-3"><div class="d-flex justify-content-between align-items-center"><label for="maxSlippage" class="form-label small text-secondary mb-1">Maximum slippage</label><strong class="mono small" id="slippageLabel">0.50%</strong></div><input class="form-range" id="maxSlippage" type="range" min="0.1" max="5" step="0.1" value="0.5"><div class="d-flex justify-content-between text-secondary" style="font-size:.7rem"><span>0.1%</span><span>5.0%</span></div></div>
             <div class="notice mb-3" id="tradePreview">Estimated notional: $12.40 · Demo estimate only.</div>
@@ -91,14 +91,14 @@
       </div>
       <div class="col-xl-8 col-lg-7">
         <section class="panel p-3 h-100">
-          <div class="d-flex justify-content-between align-items-center gap-2 mb-3"><h2 class="h6 mb-0"><i class="bi bi-activity text-warning me-2"></i>Indicative token indices</h2><span class="pill text-secondary">Static sample prices</span></div>
+          <div class="d-flex justify-content-between align-items-center gap-2 mb-3"><h2 class="h6 mb-0"><i class="bi bi-activity text-warning me-2"></i>Indicative token indices</h2><span class="pill text-secondary">Simulated market view</span></div>
           <div class="row g-3" id="marketIndices"></div>
           <div class="notice mt-3"><i class="bi bi-info-circle me-1"></i>Prices and balances are hard-coded demonstration data, not live market data, financial advice, or a quote from a liquidity provider.</div>
         </section>
       </div>
     </div>
     <section class="panel p-3 mb-3">
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><div><h2 class="h6 mb-1"><i class="bi bi-list-check text-info me-2"></i>Intent pipeline</h2><div class="text-secondary small">Review before simulated settlement. Pending intents do not alter balances.</div></div><span class="pill" id="intentCount">0 intents</span></div>
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><div><h2 class="h6 mb-1"><i class="bi bi-list-check text-info me-2"></i>Intent pipeline</h2><div class="text-secondary small">Active review queue and demo approval states</div></div><span class="pill text-secondary" id="intentCount">0 intents</span></div>
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
           <thead><tr><th>INTENT ID</th><th>PROFILE</th><th>ASSET / SIDE</th><th>QUANTITY</th><th>EST. VALUE</th><th>STATUS</th><th>ACTION</th></tr></thead>
@@ -107,7 +107,7 @@
       </div>
     </section>
     <section class="panel p-3">
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2"><h2 class="h6 mb-0"><i class="bi bi-clock-history text-info me-2"></i>Activity log</h2><span class="pill text-warning">Local only</span></div>
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2"><h2 class="h6 mb-0"><i class="bi bi-clock-history text-info me-2"></i>Activity log</h2><span class="pill text-secondary">Local events only</span></div>
       <div class="terminal p-3" id="activityLog" style="height:105px">[SYSTEM] UI initialized. No wallet connected.</div>
     </section>
     <footer class="text-secondary small py-3">Web4 Browser · Sovereign exchange prototype · No real signing, proof generation, order routing, or blockchain settlement is implemented.</footer>
@@ -140,7 +140,6 @@
   const token = symbol => vault()[symbol];
   const money = n => new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:2}).format(n);
   const qty = n => Number(n).toLocaleString("en-US",{maximumFractionDigits:6});
-  const escapeHtml = value => String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   function log(message){
     const line = document.createElement("div");
     line.textContent = "["+new Date().toLocaleTimeString()+"] "+message;
@@ -224,6 +223,7 @@
     const direction=$("tradeDirection").value,symbol=$("tradeToken").value,amount=Number($("tradeAmount").value),slippage=Number($("maxSlippage").value);
     if(!Number.isFinite(amount)||amount<=0){alert("Enter a quantity greater than zero.");return;}
     if(!initialVault[symbol]){alert("Select a supported demo asset.");return;}
+    if(symbol==="W4"){alert("W4 is the quote asset in this demo and cannot be traded against itself.");return;}
     if(direction==="SELL"&&token(symbol).balance<amount){alert("Insufficient demo balance in the active profile.");return;}
     const intent={id:makeId(),profile:profileKey(),asset:symbol,dir:direction,qty:amount,state:"Awaiting Approval",slippage};
     intents.unshift(intent);selectedIntentId=intent.id;
@@ -239,7 +239,8 @@
   function settleIntent(id){
     const intent=intents.find(i=>i.id===id);if(!intent||intent.profile!==profileKey()||intent.state!=="Awaiting Approval")return;
     const activeVault=profiles[intent.profile].vault;
-    const amount=intent.qty,symbol=intent.asset,price=initialVault[symbol].price;
+    const symbol=intent.asset,amount=intent.qty,price=initialVault[symbol]?.price;
+    if(symbol==="W4"||!Number.isFinite(price)){intent.state="Failed";log("Intent "+id+" failed: unsupported quote-asset trade.");refresh();return;}
     if(intent.dir==="SELL"&&activeVault[symbol].balance<amount){intent.state="Failed";log("Intent "+id+" failed: insufficient balance at approval.");refresh();return;}
     const estimatedImpact=amount*price*(intent.slippage/100);
     if(intent.dir==="SELL"){activeVault[symbol].balance-=amount;activeVault.W4.balance+=amount*price/initialVault.W4.price;}
@@ -271,7 +272,7 @@
   function resetDemo(){
     if(!window.confirm("Reset all demo profile balances and intent history?"))return;
     Object.keys(profiles).forEach(key=>profiles[key].vault=key==="personal"?cloneVault():{W4:{balance:180,price:1.24,prefix:"⎔"},WETH:{balance:.35,price:2840.50,prefix:"Ξ"},ZKP:{balance:42,price:8.75,prefix:"🛡"}});
-    intents=seedIntents.map(x=>({...x}));selectedIntentId=null;$("marketTerminal").textContent="[SYSTEM] Demo reset."; $("activityLog").textContent="[SYSTEM] Demo data reset. No wallet connected.";$("proofValue").textContent="No intent selected";refresh();
+    intents=seedIntents.map(x=>({...x}));selectedIntentId=null;$("marketTerminal").textContent="[SYSTEM] Demo reset."; $("activityLog").textContent="[SYSTEM] Demo data reset. No wallet connected.";refresh();
   }
   $("intentForm").addEventListener("submit",createIntent);
   $("traderProfile").addEventListener("change",()=>{terminal("[SYSTEM] Switched profile context to "+profileKey()+".");$("proofValue").textContent="Select an intent to preview its demo fingerprint.";refresh();});
