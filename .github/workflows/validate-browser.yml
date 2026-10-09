@@ -59,7 +59,7 @@ jobs:
                   raise SystemExit(f"{filename}: missing required IDs: {', '.join(missing)}")
               if parser.errors:
                   raise SystemExit(f"{filename}: " + "; ".join(parser.errors))
-              scripts = re.findall(r"<script\\b(?![^>]*\\bsrc=)[^>]*>(.*?)</script\\s*>", html, re.I | re.S)
+              scripts = re.findall(r"<script\b(?![^>]*\bsrc=)[^>]*>(.*?)</script\s*>", html, re.I | re.S)
               if not scripts:
                   raise SystemExit(f"{filename}: no inline script found")
               for index, script in enumerate(scripts):
