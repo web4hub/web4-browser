@@ -243,7 +243,6 @@
     const activeVault=profiles[intent.profile].vault;
     const amount=intent.qty,symbol=intent.asset,price=initialVault[symbol]?.price;
     if(symbol==="W4"||!Number.isFinite(price)){intent.state="Failed";log("Intent "+id+" failed: unsupported quote-asset trade.");refresh();return;}
-    const amount=intent.qty,symbol=intent.asset,price=initialVault[symbol].price;
     if(intent.dir==="SELL"&&activeVault[symbol].balance<amount){intent.state="Failed";log("Intent "+id+" failed: insufficient balance at approval.");refresh();return;}
     const estimatedImpact=amount*price*(intent.slippage/100);
     if(intent.dir==="SELL"){activeVault[symbol].balance-=amount;activeVault.W4.balance+=amount*price/initialVault.W4.price;}
