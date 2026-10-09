@@ -1,433 +1,138 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-bs-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web4 Sovereign Virtual Cash Hub & FX Clearing House</title>
-    <!-- Bootstrap 5 CSS & Icons CDN -->
-    <link href="https://jsdelivr.net" rel="stylesheet">
-    <link href="https://jsdelivr.net" rel="stylesheet">
-    <!-- html2pdf Library for Client-Side PDF Generation -->
-    <script src="https://cloudflare.com"></script>
-    <style>
-        :root {
-            --w4-glow: #00ff87;
-            --w4-bank: #00f2fe;
-            --w4-agent: #aa33ff;
-            --surface-bg: #060709;
-            --panel-bg: #0d0f14;
-            --card-bg: #141722;
-            --border-ui: #22293a;
-        }
-
-        body {
-            background-color: var(--surface-bg);
-            color: #f8f9fa;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Inter', system-ui, sans-serif;
-        }
-
-        .web4-header {
-            background-color: var(--panel-bg);
-            border-bottom: 1px solid var(--border-ui);
-        }
-
-        .brand-gradient {
-            font-weight: 800;
-            background: linear-gradient(90deg, #00ff87, #00f2fe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .workspace-grid {
-            height: calc(100vh - 70px);
-        }
-
-        .w4-sidebar {
-            background-color: var(--panel-bg);
-            border-right: 1px solid var(--border-ui);
-            width: 340px;
-        }
-
-        .currency-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-ui);
-            transition: all 0.2s ease-in-out;
-            cursor: pointer;
-        }
-
-        .currency-card:hover {
-            border-color: var(--w4-glow);
-            box-shadow: 0 0 12px rgba(0, 255, 135, 0.15);
-        }
-
-        .agent-terminal {
-            background-color: #040507;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.8rem;
-            color: #adbac7;
-            border: 1px solid var(--border-ui);
-            height: 120px;
-            overflow-y: auto;
-        }
-
-        .vault-canvas {
-            background-color: #08090f;
-            position: relative;
-            overflow-y: auto;
-        }
-
-        .font-mono {
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        /* Printable Paper Note Security Blueprint Look */
-        .printable-note-blueprint {
-            background: linear-gradient(135deg, #111b15 0%, #070d0a 100%);
-            border: 3px dashed #00ff87 !important;
-            border-radius: 12px;
-            color: #ffffff;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .watermark-bg {
-            position: absolute;
-            font-size: 7rem;
-            color: rgba(0, 255, 135, 0.03);
-            font-weight: 900;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg);
-            white-space: nowrap;
-            pointer-events: none;
-            user-select: none;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Web4 local demo for tokenized cash notes, FX estimates, and lifecycle audit previews.">
+  <title>Web4 · Token Gateway</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root{--glow:#00ffad;--cyan:#00d9ff;--agent:#b56cff;--bg:#080a0e;--panel:#11151d;--card:#171d27;--line:#293243;--muted:#9ba8ba}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f3f6fb;font-family:Inter,system-ui,-apple-system,sans-serif;min-height:100vh}
+    .topbar,.sidebar{background:var(--panel);border-color:var(--line)!important}.brand{font-weight:850;letter-spacing:.035em;background:linear-gradient(90deg,var(--glow),var(--cyan));background-clip:text;color:transparent}
+    .workspace{min-height:calc(100vh - 66px)}.sidebar{width:320px;flex:0 0 320px;border-right:1px solid}.canvas{min-width:0;flex:1}.panel,.metric{background:var(--card);border:1px solid var(--line);border-radius:14px}
+    .eyebrow{font-size:.69rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+    .note{background:#0d1219;border:1px solid var(--line);border-radius:10px;cursor:pointer}.note:hover,.note.active{border-color:var(--cyan)}.terminal{background:#05070a;border:1px solid var(--line);border-radius:10px;height:145px;overflow:auto;white-space:pre-wrap;color:#bdc8d8;font:12px/1.6 ui-monospace,monospace}
+    .form-control,.form-select{background:#090d13;border-color:#374154;color:#f3f6fb}.form-control:focus,.form-select:focus{background:#090d13;color:#fff;border-color:var(--cyan);box-shadow:0 0 0 .2rem #00d9ff20}
+    .metric{padding:1rem}.status{font-size:.72rem;border:1px solid var(--line);border-radius:99px;padding:.25rem .6rem}.notice{font-size:.8rem;background:#101722;border:1px solid var(--line);border-radius:10px;padding:.8rem;color:#c8d1df}
+    @media(max-width:850px){.workspace{display:block!important}.sidebar{width:100%;border-right:0;border-bottom:1px solid}.canvas{padding:1rem!important}}
+  </style>
 </head>
 <body>
-
-    <!-- Web4 Sovereign Fiat Navigation Hub -->
-    <header class="navbar navbar-dark web4-header px-4 py-2">
-        <div class="container-fluid p-0">
-            <span class="navbar-brand brand-gradient fs-5 m-0 me-auto">
-                <i class="bi bi-cash-stack me-2"></i>WEB4 // SOVEREIGN VIRTUAL CASH GATEWAY
-            </span>
-            
-            <div class="d-flex align-items-center bg-black bg-opacity-40 border border-secondary border-opacity-20 rounded-pill p-1 pe-3">
-                <div class="rounded-circle me-2" style="width:30px; height:30px; background: linear-gradient(135deg, #00ff87 0%, #00f2fe 100%);"></div>
-                <div class="lh-sm">
-                    <div class="fw-bold text-white small">Sovereign Signer</div>
-                    <div class="text-secondary font-monospace" style="font-size: 10px;">did:w4:fiat:77c21...</div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <div class="d-flex workspace-grid">
-        
-        <!-- Web4 Framework Orchestration Sidebar -->
-        <aside class="w4-sidebar p-3 d-flex flex-column gap-3">
-            <div>
-                <label class="form-label small fw-bold text-secondary text-uppercase tracking-wider">Signer Profile Context</label>
-                <select class="form-select form-select-sm bg-black border-secondary text-white shadow-none" id="fiatContext">
-                    <option value="personal">Personal Liquidity Pool (did:w4:fiat:77c2)</option>
-                    <option value="corporate">Offshore Enterprise Node (did:w4:fiat:90ab)</option>
-                </select>
-            </div>
-
-            <!-- Model Context Protocol (MCP) Bank Clearing Engine -->
-            <div class="border border-secondary border-opacity-30 rounded p-2 bg-black bg-opacity-20">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <label class="small fw-bold text-uppercase tracking-wider" style="color:var(--w4-agent);"><i class="bi bi-cpu me-1"></i>MCP Settlement Broker</label>
-                    <span class="badge bg-purple bg-opacity-10 text-purple border border-purple font-monospace" style="font-size:9px; color:var(--w4-agent);">ISO20022 Sync</span>
-                </div>
-                <div class="agent-terminal p-2 rounded mb-2 font-mono" id="gatewayTerminal">
-                    [SYSTEM]: Awaiting Bank Remittance Intent...
-                </div>
-                <button class="btn btn-sm btn-outline-info w-100 text-start" onclick="triggerAutoClearingAgent()" style="font-size: 11px;">
-                    <i class="bi bi-lightning-charge-fill me-1 text-warning"></i>Delegate AI to Sweep Small Notes into Bank
-                </button>
-            </div>
-
-            <!-- Verified Ledger Cryptographic Paper Inventory -->
-            <div class="flex-grow-1 overflow-y-auto">
-                <label class="form-label small fw-bold text-secondary text-uppercase tracking-wider">Unspent Paper Notes Vault</label>
-                <div class="d-flex flex-column gap-2" id="paperCurrencyList">
-                    <!-- Note tokens populate dynamically here -->
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Workspace Operational Canvas -->
-        <main class="vault-canvas flex-grow-1 p-4">
-            
-            <div class="row g-3 mb-3">
-                <!-- Local Bank Clearance Settlement Module -->
-                <div class="col-xl-3 col-md-6">
-                    <div class="card bg-dark bg-opacity-50 border-secondary p-3 shadow-sm h-100">
-                        <h6 class="text-white mb-2"><i class="bi bi-bank2 text-info me-2"></i>Bank Remittance</h6>
-                        <div class="mb-2">
-                            <label class="form-label small text-secondary" style="font-size:11px;">Target Bank Routing</label>
-                            <select class="form-select form-select-sm bg-black border-secondary text-light shadow-none" id="bankRoute">
-                                <option value="Access Bank">Access Bank Plc</option>
-                                <option value="Zenith Bank">Zenith Bank International</option>
-                                <option value="GTBank">Guaranty Trust Bank (GTB)</option>
-                                <option value="United Bank for Africa">United Bank for Africa (UBA)</option>
-                            </select>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label small text-secondary" style="font-size:11px;">Account Number</label>
-                            <input type="text" class="form-control form-control-sm bg-black border-secondary text-light font-mono shadow-none" id="bankAccount" value="0114029381">
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label small text-secondary" style="font-size:11px;">Target Note</label>
-                            <input type="text" class="form-control form-control-sm bg-black border-secondary text-warning font-mono shadow-none" id="targetNoteField" placeholder="Select a note card" readonly>
-                        </div>
-                        <button class="btn btn-sm btn-success w-100 fw-bold shadow-none" onclick="processBankRemittance()">
-                            <i class="bi bi-arrow-up-right-circle me-1"></i>Sign & Liquidate Note
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Web4 Cash-In Voucher Minting Panel -->
-                <div class="col-xl-3 col-md-6">
-                    <div class="card bg-dark bg-opacity-50 border-secondary p-3 shadow-sm h-100">
-                        <h6 class="text-white mb-2"><i class="bi bi-plus-square-fill text-success me-2"></i>Cash-In Minter</h6>
-                        <div class="mb-2">
-                            <label class="form-label small text-secondary" style="font-size:11px;">Inbound Deposit Reference</label>
-                            <input type="text" class="form-control form-control-sm bg-black border-secondary text-light font-mono shadow-none" id="mintRef" value="REF-992104B">
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label small text-secondary" style="font-size:11px;">Denomination (NGN)</label>
-
-₦25,000 NGN Note
-₦50,000 NGN Note
-₦100,000 NGN Note
-
-
-
-
-Execute Mint
-
-
-
-FX Exchange Engine
-Re-denominate and swap selected unspent paper bill nodes into foreign asset parameters.
-USD ($) - Rate: 1,720
-EUR (€) - Rate: 1,850
-NGN (₦) - Base Asset
-
-
-
-
-Sign & Mutate Asset Currency
-
-
-
-Oracle Statistics
-
-NGN Market Rate Indices
-USD: ₦1,720.00 | EUR: ₦1,850.00
-
-
-Total Combined Vault Assets (Base)
-₦175,000
-
-
-
-Sovereign Note Blueprint Exporter
-
-Inspect Audit Trail
-Export Document PDF
-
-WEB4 SECURE
-
-
-Verifiable Cash Certificate
-₦50,000 NGN
-Serial Root: W4-NGN-XXXXX
-Minter Validation DID: did:w4:fiat:77c21ae99bcc
-Content Ledger Hash: ipfs://bafybeih402...
-
-
-
-
-
-VALID WEB4
-
-
-
-
-
-Verifiable Clearing Log Registry
-Sovereign Note Lifecycle Audit Log
-
-
-
-
-
-Target Asset Serial: -
-Content-Addressing Pointer: -
-
-Close Inspector
-
-
-
-const fxRates = { 'NGN': 1, 'USD': 1720, 'EUR': 1850 };
-const currencySymbols = { 'NGN': '₦', 'USD': '$', 'EUR': '€' };
-let digitalCashNotes = [
-{ serial: 'W4-NGN-99a410b', denomination: 50000, currency: 'NGN', hash: 'ipfs://bafybeih6h7u42x99aa1',
-history: ['[2026-10-09 20:11:02] MINT_INBOUND_DEPOSIT_RESERVE // Validated Bank Clearing Ref: REF-002A1', '[2026-10-09 20:11:02] COMPRESSED_STATE_COMMIT // Note Sealed on Web4 Distributed Ledger Node'] },
-{ serial: 'W4-NGN-12c884x', denomination: 100000, currency: 'NGN', hash: 'ipfs://bafybeic77f44a108b2c',
-history: ['[2026-10-09 21:04:15] MINT_INBOUND_DEPOSIT_RESERVE // Validated Bank Clearing Ref: REF-8839Z'] },
-{ serial: 'W4-NGN-44f711z', denomination: 25000, currency: 'NGN', hash: 'ipfs://bafybeid09x33aa77fe4',
-history: ['[2026-10-09 21:30:00] MINT_INBOUND_DEPOSIT_RESERVE // Validated Bank Clearing Ref: REF-4412X'] }
-];
-let historicalClearingLogs = [
-{ id: 'tx-clear-801', serial: 'W4-NGN-00b411d', institution: 'GTBank', account: '0119928341', amount: '₦50,000', proof: 'Settled_Cleared' }
-];
-let targetedNoteIndex = null;
-let bsAuditModalObj = null;
-window.onload = () => {
-bsAuditModalObj = new bootstrap.Modal(document.getElementById('auditModal'));
-refreshGatewayUiAll();
-};
-function refreshGatewayUiAll() {
-const noteContainer = document.getElementById('paperCurrencyList');
-noteContainer.innerHTML = '';
-let baseRollingSum = 0;
-digitalCashNotes.forEach((note, index) => {
-baseRollingSum += (note.denomination * fxRates[note.currency]);
-const div = document.createElement('div');
-div.className = 'currency-card p-2 rounded d-flex justify-content-between align-items-center mb-1';
-if(targetedNoteIndex === index) {
-div.style.borderColor = 'var(--w4-bank)';
-div.style.backgroundColor = 'rgba(0, 242, 254, 0.05)';
-}
-div.onclick = () => selectNoteForRemittance(index);
-div.innerHTML = <div> <div class="small fw-bold font-mono text-success"><i class="bi bi-ticket-perforated-fill me-2"></i>${currencySymbols[note.currency]}${note.denomination.toLocaleString()} ${note.currency}</div> <div class="text-secondary font-monospace" style="font-size:9px;">Serial: ${note.serial}</div> </div> <i class="bi bi-shield-lock-fill text-secondary"></i>;
-noteContainer.appendChild(div);
-});
-document.getElementById('totalVaultLabel').innerText = ₦${baseRollingSum.toLocaleString()};
-const tbody = document.getElementById('clearingLogBody');
-tbody.innerHTML = '';
-historicalClearingLogs.forEach(log => {
-const tr = document.createElement('tr');
-tr.innerHTML = `
-`;
-tbody.appendChild(tr);
-});
-}
-function selectNoteForRemittance(index) {
-targetedNoteIndex = index;
-const note = digitalCashNotes[index];
-const sym = currencySymbols[note.currency];
-document.getElementById('targetNoteField').value = ${note.serial} (${sym}${note.denomination.toLocaleString()});
-document.getElementById('blueprintContainer').classList.remove('d-none');
-document.getElementById('pdfDenomination').innerText = ${sym}${note.denomination.toLocaleString()} ${note.currency};
-document.getElementById('pdfSerial').innerText = note.serial;
-document.getElementById('pdfHash').innerText = Content Ledger Hash: ${note.hash};
-refreshGatewayUiAll();
-}
-function executeFxNoteSwap() {
-if(targetedNoteIndex === null) { alert('Select a cash sheet from the left inventory ledger first.'); return; }
-const note = digitalCashNotes[targetedNoteIndex];
-const targetCurrency = document.getElementById('fxTargetCurrency').value;
-if(note.currency === targetCurrency) { alert('Asset is already denominated in selected target parameter currency.'); return; }
-const term = document.getElementById('gatewayTerminal');
-term.innerHTML += \n[FX_ENGINE]: Swapping note currency context ${note.currency} ⟶ ${targetCurrency}.;
-// Cryptographic calculations: Evaluate cross-rates balances conversions adjustments
-let currentBaseValue = note.denomination * fxRates[note.currency];
-let newDenomination = Math.round(currentBaseValue / fxRates[targetCurrency]);
-note.history.unshift([2026-10-09 21:48:32] FX_CURRENCY_SWAP // Mutated Denomination from ${currencySymbols[note.currency]}${note.denomination} ${note.currency} into ${currencySymbols[targetCurrency]}${newDenomination} ${targetCurrency});
-note.currency = targetCurrency;
-note.denomination = newDenomination;
-note.serial = W4-${targetCurrency}- + Math.random().toString(36).substring(2, 9);
-term.innerHTML += \n[FX_ENGINE]: Re-issued mutated serial wrapper: ${note.serial};
-term.scrollTop = term.scrollHeight;
-selectNoteForRemittance(targetedNoteIndex);
-}
-function launchAuditTrailModal() {
-if(targetedNoteIndex === null) return;
-const note = digitalCashNotes[targetedNoteIndex];
-document.getElementById('auditModalSerial').innerText = note.serial;
-document.getElementById('auditModalHash').innerText = note.hash;
-const list = document.getElementById('auditTrailList');
-list.innerHTML = '';
-note.history.forEach(logLine => {
-list.innerHTML += <div class="list-group-item bg-black border-secondary text-secondary small p-2 font-mono"><i class="bi bi-shield-check text-info me-2"></i>${logLine}</div>;
-});
-bsAuditModalObj.show();
-}
-function mintCashVoucher() {
-const refNum = document.getElementById('mintRef').value;
-const amount = parseInt(document.getElementById('mintAmount').value);
-if(!refNum.trim()) return;
-const newSerial = 'W4-NGN-' + Math.random().toString(36).substring(2, 9);
-const mockCid = 'ipfs://bafybeimint' + Math.random().toString(16).substring(2, 10);
-const newNote = {
-serial: newSerial, denomination: amount, currency: 'NGN', hash: mockCid,
-history: [[2026-10-09 21:48:32] MINT_INBOUND_DEPOSIT_RESERVE // Bank Ref Match Proof: ${refNum}]
-};
-digitalCashNotes.unshift(newNote);
-document.getElementById('gatewayTerminal').innerHTML += \n[MINTER]: Minted new note asset nodes successfully. [Serial: ${newSerial}];
-refreshGatewayUiAll();
-selectNoteForRemittance(0);
-}
-function exportNoteAsPDF() {
-const element = document.getElementById('targetPDFNote');
-const serial = document.getElementById('pdfSerial').innerText;
-const options = {
-margin: 10, filename: Web4-Note-${serial}.pdf, image: { type: 'jpeg', quality: 0.98 },
-html2canvas: { scale: 2, backgroundColor: '#070d0a' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-};
-html2pdf().set(options).from(element).save();
-}
-function processBankRemittance() {
-if(targetedNoteIndex === null) return;
-const bank = document.getElementById('bankRoute').value;
-const account = document.getElementById('bankAccount').value;
-if(!account.trim() || account.length < 10) return;
-const note = digitalCashNotes[targetedNoteIndex];
-const sym = currencySymbols[note.currency];
-const newTxId = 'tx-clear-' + Math.floor(Math.random() * 900 + 100);
-historicalClearingLogs.unshift({
-id: newTxId, serial: note.serial, institution: bank, account: account,
-amount: ${sym}${note.denomination.toLocaleString()} ${note.currency}, proof: 'Clearing_Initiated'
-});
-digitalCashNotes.splice(targetedNoteIndex, 1);
-targetedNoteIndex = null;
-document.getElementById('targetNoteField').value = '';
-document.getElementById('blueprintContainer').classList.add('d-none');
-document.getElementById('gatewayTerminal').innerHTML += \n[GATEWAY]: Transmitted burn code sequence. Initiating credit payload to ${bank}...;
-setTimeout(() => {
-historicalClearingLogs[0].proof = 'Settled_Cleared';
-document.getElementById('gatewayTerminal').innerHTML += \n[GATEWAY]: Settlement completed flawlessly to local retail account.;
-refreshGatewayUiAll();
-}, 3000);
-refreshGatewayUiAll();
-}
-function triggerAutoClearingAgent() {
-if(digitalCashNotes.length === 0) return;
-selectNoteForRemittance(0);
-setTimeout(() => { processBankRemittance(); }, 1500);
-}
-
-
-
----
-
-### Expanded Architectural Capabilities Added:
-1. **The Foreign Exchange Token Engine:** The added currency system updates note attributes programmatically using relative baseline conversions (`NGN`, `USD`, `EUR`). The script burns the old note configuration and generates an updated currency design instance with unique identifier roots.
-2. **Cryptographic Lifecycle History (Audit Trails):** Every note asset array contains an isolated tracking structure (`history: []`). Every lifecycle event—including initial voucher mint validation checks or FX pool adjustments—is dynamically tracked and displayed in the audit trail view.
-3. **Bootstrap 5 Modal Viewport Integration:** Incorporates a modular overlay pane to display cryptographic verification records without cluttering the main terminal space.
-
-<FollowUp>
-Now that your core application features have been deployed into production files, let me know if you would like to:
-* Set up a **Local Sandbox Data Storage pipeline** (`localStorage`) to make your minted note lifecycles persist across reloads?
-* Hook up a simulated **Automated Yield-Optimizer script** that lets agents deposit unspent bills into high-yield local credit syndicates?
-</FollowUp>
-
-
+<header class="topbar border-bottom px-3 px-lg-4 py-3">
+  <div class="d-flex align-items-center justify-content-between gap-3">
+    <a class="brand text-decoration-none" href="../index.html"><i class="bi bi-currency-exchange me-2"></i>WEB4 // TOKEN GATEWAY</a>
+    <span class="status text-warning"><i class="bi bi-exclamation-triangle me-1"></i>Local simulation only</span>
+  </div>
+</header>
+<div class="workspace d-flex">
+  <aside class="sidebar p-3 d-flex flex-column gap-3">
+    <div>
+      <div class="eyebrow mb-2">Demo profile context</div>
+      <select id="profile" class="form-select form-select-sm" aria-label="Demo profile">
+        <option value="personal">Personal Core</option><option value="business">Business Workspace</option>
+      </select>
+      <p class="small text-secondary mt-2 mb-0">Profile labels are local UI context, not authenticated Web4 identities.</p>
+    </div>
+    <section>
+      <div class="eyebrow mb-2">Tokenized note inventory</div>
+      <div id="inventory" class="d-grid gap-2" aria-live="polite"></div>
+      <button id="reset" type="button" class="btn btn-sm btn-outline-secondary w-100 mt-2">Reset demo data</button>
+    </section>
+    <section class="panel p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2"><div class="eyebrow">Activity terminal</div><span class="status text-info">Local</span></div>
+      <div id="terminal" class="terminal p-2" role="log" aria-live="polite">[SYSTEM] Token gateway demo ready. No external services connected.</div>
+    </section>
+  </aside>
+  <main class="canvas p-3 p-xl-4">
+    <div class="mb-4"><div class="eyebrow mb-1">Web4 · Cash token workspace</div><h1 class="h3 mb-1">Token Gateway & Lifecycle</h1><p class="text-secondary mb-0">Inspect sample notes, calculate indicative FX conversions, and exercise a clearly simulated lifecycle.</p></div>
+    <div class="row g-3 mb-3">
+      <div class="col-md-4"><div class="metric h-100"><div class="eyebrow">Selected note</div><div class="h5 mono mt-2 mb-1" id="selectedValue">None selected</div><div class="small text-secondary mono" id="selectedSerial">Choose a note from inventory.</div></div></div>
+      <div class="col-md-4"><div class="metric h-100"><div class="eyebrow">Inventory total</div><div class="h4 mt-2 mb-1" id="inventoryTotal">₦0</div><div class="small text-secondary">NGN-equivalent at bundled sample rates</div></div></div>
+      <div class="col-md-4"><div class="metric h-100"><div class="eyebrow">Integration status</div><div class="h5 text-warning mt-2 mb-1">Disconnected</div><div class="small text-secondary">No bank, wallet, chain, or MCP endpoint is called.</div></div></div>
+    </div>
+    <div class="row g-3 mb-3">
+      <div class="col-xl-6">
+        <section class="panel p-3 h-100">
+          <h2 class="h6 mb-3"><i class="bi bi-plus-circle text-success me-2"></i>Create demo note</h2>
+          <form id="mintForm">
+            <label for="mintRef" class="form-label small">Reference label</label>
+            <input id="mintRef" class="form-control form-control-sm mb-3" maxlength="48" required placeholder="e.g. DEMO-REF-001">
+            <label for="mintAmount" class="form-label small">Denomination (NGN)</label>
+            <select id="mintAmount" class="form-select form-select-sm mb-3"><option value="25000">₦25,000</option><option value="50000" selected>₦50,000</option><option value="100000">₦100,000</option></select>
+            <button class="btn btn-success btn-sm w-100" type="submit">Create local demo note</button>
+          </form>
+        </section>
+      </div>
+      <div class="col-xl-6">
+        <section class="panel p-3 h-100">
+          <h2 class="h6 mb-3"><i class="bi bi-arrow-left-right text-info me-2"></i>Indicative FX conversion</h2>
+          <div class="notice mb-3">Bundled demo rates: USD = ₦1,720; EUR = ₦1,850. These are not live quotes.</div>
+          <label for="fxCurrency" class="form-label small">Target currency</label>
+          <select id="fxCurrency" class="form-select form-select-sm mb-3"><option value="NGN">NGN · Nigerian naira</option><option value="USD">USD · US dollar</option><option value="EUR">EUR · euro</option></select>
+          <div class="small text-secondary mb-2">Estimated converted denomination</div><div class="h4 mono" id="fxPreview">Select a note</div>
+          <button id="applyFx" type="button" class="btn btn-outline-info btn-sm w-100" disabled>Apply simulated conversion</button>
+        </section>
+      </div>
+    </div>
+    <div class="row g-3 mb-3">
+      <div class="col-xl-6">
+        <section class="panel p-3 h-100">
+          <h2 class="h6 mb-3"><i class="bi bi-bank text-info me-2"></i>Remittance preview</h2>
+          <label for="bankRoute" class="form-label small">Illustrative destination</label>
+          <select id="bankRoute" class="form-select form-select-sm mb-3"><option>Access Bank</option><option>Zenith Bank</option><option>GTBank</option><option>United Bank for Africa</option></select>
+          <p class="small text-secondary">This records a local simulation only. It will not submit a transfer, debit a wallet, or contact a financial institution.</p>
+          <button id="simulateRemittance" type="button" class="btn btn-outline-success btn-sm w-100" disabled>Record simulated remittance</button>
+        </section>
+      </div>
+      <div class="col-xl-6">
+        <section class="panel p-3 h-100">
+          <div class="d-flex align-items-center justify-content-between gap-2 mb-3"><h2 class="h6 mb-0"><i class="bi bi-journal-text text-agent me-2"></i>Selected note audit</h2><button id="exportAudit" type="button" class="btn btn-sm btn-outline-secondary">Export JSON</button></div>
+          <div id="audit" class="small text-secondary">Select a note to view its local lifecycle events.</div>
+        </section>
+      </div>
+    </div>
+    <section class="panel p-3">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3"><h2 class="h6 mb-0">Local lifecycle log</h2><span class="status text-secondary">Not a ledger proof</span></div>
+      <div class="table-responsive"><table class="table table-sm table-hover align-middle mb-0"><thead><tr><th>Event ID</th><th>Note serial</th><th>Action</th><th>Status</th><th>Timestamp</th></tr></thead><tbody id="eventRows"><tr><td colspan="5" class="text-secondary text-center">No events yet.</td></tr></tbody></table></div>
+    </section>
+    <footer class="small text-secondary py-3">Prototype only. Serial numbers and hashes are demo identifiers, not cryptographic proofs. Do not enter bank account numbers, recovery phrases, or real financial credentials.</footer>
+  </main>
+</div>
+<script>
+(function(){
+  "use strict";
+  const rates={NGN:1,USD:1720,EUR:1850},symbols={NGN:"₦",USD:"$",EUR:"€"};
+  const seed=[{serial:"W4-NGN-DEMO01",amount:50000,currency:"NGN",history:[{action:"DEMO_SEED",detail:"Sample note loaded for preview.",at:new Date().toISOString()}]},{serial:"W4-NGN-DEMO02",amount:100000,currency:"NGN",history:[{action:"DEMO_SEED",detail:"Sample note loaded for preview.",at:new Date().toISOString()}]},{serial:"W4-NGN-DEMO03",amount:25000,currency:"NGN",history:[{action:"DEMO_SEED",detail:"Sample note loaded for preview.",at:new Date().toISOString()}]}];
+  const $=id=>document.getElementById(id),cloneSeed=()=>JSON.parse(JSON.stringify(seed));
+  let state={personal:cloneSeed(),business:cloneSeed()},events=[],selected=null,counter=0;
+  const money=(amount,currency)=>symbols[currency]+Number(amount).toLocaleString("en-NG",{maximumFractionDigits:2})+" "+currency;
+  const escapeHtml=value=>String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const activeNotes=()=>state[$("profile").value];
+  const note=()=>activeNotes().find(item=>item.serial===selected)||null;
+  function log(message){const line=document.createElement("div");line.textContent="["+new Date().toLocaleTimeString()+"] "+message;$("terminal").append(line);$("terminal").scrollTop=$("terminal").scrollHeight;}
+  function addEvent(item,action,status,detail){const entry={id:"evt-"+(++counter),serial:item?item.serial:"-",action,status,detail,at:new Date().toISOString()};events.unshift(entry);if(item)item.history.unshift({action,detail,at:entry.at});}
+  function render(){
+    const list=$("inventory");list.replaceChildren();let total=0;
+    activeNotes().forEach(item=>{total+=item.amount*rates[item.currency];const button=document.createElement("button");button.type="button";button.className="note p-3 text-start "+(item.serial===selected?"active":"");button.setAttribute("aria-pressed",String(item.serial===selected));button.innerHTML='<div class="d-flex justify-content-between gap-2"><strong class="text-success">'+escapeHtml(money(item.amount,item.currency))+'</strong><i class="bi bi-ticket-perforated text-secondary"></i></div><div class="mono small text-secondary mt-1">'+escapeHtml(item.serial)+'</div>';button.addEventListener("click",()=>{selected=item.serial;render();});list.append(button);});
+    $("inventoryTotal").textContent=money(total,"NGN");const current=note();
+    $("selectedValue").textContent=current?money(current.amount,current.currency):"None selected";$("selectedSerial").textContent=current?current.serial:"Choose a note from inventory.";
+    $("applyFx").disabled=!current||current.currency===$("fxCurrency").value;$("simulateRemittance").disabled=!current;
+    $("fxPreview").textContent=current?money(Math.round(current.amount*rates[current.currency]/rates[$("fxCurrency").value]),$("fxCurrency").value):"Select a note";
+    $("audit").innerHTML=current?current.history.map(h=>'<div class="border-bottom border-secondary border-opacity-25 py-2"><div class="text-light">'+escapeHtml(h.action)+'</div><div>'+escapeHtml(h.detail)+'</div><div class="mono" style="font-size:.7rem">'+escapeHtml(h.at)+'</div></div>').join(""):"Select a note to view its local lifecycle events.";
+    const rows=$("eventRows");rows.replaceChildren();if(!events.length){const tr=document.createElement("tr");tr.innerHTML='<td colspan="5" class="text-secondary text-center">No events yet.</td>';rows.append(tr);}else events.forEach(e=>{const tr=document.createElement("tr");[e.id,e.serial,e.action,e.status,new Date(e.at).toLocaleString()].forEach(value=>{const td=document.createElement("td");td.textContent=value;tr.append(td);});rows.append(tr);});
+  }
+  $("profile").addEventListener("change",()=>{selected=null;log("Switched local demo profile; no identity authentication occurred.");render();});
+  $("fxCurrency").addEventListener("change",render);
+  $("mintForm").addEventListener("submit",event=>{event.preventDefault();const ref=$("mintRef").value.trim();const amount=Number($("mintAmount").value);if(!ref||!Number.isFinite(amount)||amount<=0)return;const item={serial:"W4-"+$("profile").value.toUpperCase()+"-"+(++counter).toString(36).toUpperCase().padStart(4,"0"),amount,currency:"NGN",history:[]};activeNotes().unshift(item);selected=item.serial;addEvent(item,"DEMO_NOTE_CREATED","SIMULATED","Local reference label: "+ref);log("Created demo note "+item.serial+"; no deposit or mint transaction occurred.");$("mintRef").value="";render();});
+  $("applyFx").addEventListener("click",()=>{const item=note();if(!item)return;const target=$("fxCurrency").value;if(target===item.currency)return;const old=item.currency+" "+item.amount;item.amount=Math.round(item.amount*rates[item.currency]/rates[target]*100)/100;item.currency=target;item.serial="W4-"+target+"-"+(++counter).toString(36).toUpperCase().padStart(4,"0");addEvent(item,"DEMO_FX_CONVERSION","SIMULATED",old+" converted using bundled sample rates.");log("Applied indicative FX conversion locally. No market quote was requested.");render();});
+  $("simulateRemittance").addEventListener("click",()=>{const item=note();if(!item)return;if(!confirm("Record a local remittance simulation? No bank transfer will be sent."))return;const destination=$("bankRoute").value;addEvent(item,"REMITTANCE_PREVIEW","SIMULATED","Illustrative destination: "+destination+". No funds moved.");log("Recorded simulated remittance preview for "+item.serial+".");activeNotes().splice(activeNotes().indexOf(item),1);selected=null;render();});
+  $("exportAudit").addEventListener("click",()=>{const item=note();if(!item){alert("Select a note first.");return;}const blob=new Blob([JSON.stringify({notice:"Local demo data; not a cryptographic proof or financial record.",note:item,events:events.filter(e=>e.serial===item.serial)},null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=item.serial+"-audit-demo.json";a.click();URL.revokeObjectURL(url);});
+  $("reset").addEventListener("click",()=>{if(!confirm("Reset both local demo inventories and the activity log?"))return;state={personal:cloneSeed(),business:cloneSeed()};events=[];selected=null;counter=0;$("terminal").textContent="[SYSTEM] Demo data reset. No external service contacted.";render();});
+  render();
+})();
+</script>
+</body>
+</html>
