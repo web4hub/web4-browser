@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="Web4 Browser prototype with profile-scoped navigation, local history, bookmarks, and explicit identity boundaries.">
+<meta name="color-scheme" content="dark">
+<title>Web4 Browser · Sovereign Workspace</title>
+<style>
+:root{color-scheme:dark;--bg:#090b10;--panel:#11151d;--surface:#171d27;--line:#2a3443;--text:#eef3fb;--muted:#9aa8ba;--accent:#48d9ed;--accent2:#a78bfa;--danger:#ff7385}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,sans-serif;height:100vh;display:flex;flex-direction:column}button,input,select{font:inherit}button{cursor:pointer;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 11px}button:hover{border-color:var(--accent)}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button:disabled{opacity:.4;cursor:not-allowed}input,select{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px;min-width:0}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--panel)}.brand{font-weight:850;letter-spacing:.06em;color:var(--accent)}.identity{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}.identity strong{color:var(--text)}.tabs{display:flex;align-items:center;gap:6px;padding:8px 10px 0;overflow-x:auto;background:var(--bg)}.tab{display:flex;align-items:center;gap:10px;min-width:140px;max-width:220px;padding:9px 10px;border-radius:9px 9px 0 0;color:var(--muted)}.tab.active{background:var(--surface);border-bottom-color:var(--accent);color:var(--text)}.tab-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tab .close{padding:0;border:0;background:transparent;color:var(--muted)}.toolbar{display:flex;align-items:center;gap:7px;padding:10px;border-block:1px solid var(--line);background:var(--surface)}.toolbar button{padding:9px 11px}.address{flex:1;display:flex;min-width:80px}.address input{width:100%;border-radius:10px}.layout{display:flex;flex:1;min-height:0}.side{width:255px;flex:0 0 255px;background:var(--panel);border-right:1px solid var(--line);overflow:auto;padding:14px}.side section{margin-bottom:20px}.eyebrow{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:9px}.profile{width:100%}.help{font-size:12px;color:var(--muted);margin:8px 0 0}.link-list{display:grid;gap:6px}.link-item{width:100%;text-align:left;display:flex;justify-content:space-between;gap:8px;font-size:12px;overflow-wrap:anywhere}.content{flex:1;min-width:0;position:relative;background:#0b0e14}.page{position:absolute;inset:0;display:none;background:#fff}.page.active{display:block}.page iframe{display:block;width:100%;height:100%;border:0;background:#fff}.home{height:100%;overflow:auto;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 15%,#17303c 0,transparent 45%),var(--bg)}.home-card{max-width:700px;width:100%;border:1px solid var(--line);border-radius:20px;padding:clamp(22px,5vw,42px);background:#111720}.home h1{font-size:clamp(28px,4vw,44px);line-height:1.05;margin:10px 0}.home p{color:var(--muted)}.quick{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.status{display:flex;justify-content:space-between;gap:10px;padding:7px 12px;border-top:1px solid var(--line);color:var(--muted);font-size:11px;background:var(--panel)}.tag{border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:10px}.danger{color:var(--danger)}.notice{border:1px solid #54452a;background:#211b10;color:#f0d7a0;padding:10px;border-radius:9px;font-size:12px;margin-top:12px}
+@media(max-width:760px){.top{padding:10px}.identity .did{display:none}.side{width:180px;flex-basis:180px;padding:10px}.toolbar{gap:4px;padding:7px}.toolbar button{padding:8px}.hide-small{display:none}.brand{font-size:12px}}
+@media(max-width:540px){.layout{flex-direction:column}.side{width:100%;flex:0 0 auto;max-height:155px;border-right:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:12px}.side section{margin:0}.side .secondary{display:none}.content{min-height:0}.toolbar button{padding:8px 9px}.identity{gap:5px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">⎔ WEB4 BROWSER</div>
+  <div class="identity"><span class="tag">LOCAL PROTOTYPE</span><div><strong id="profileName">Personal Core</strong><div class="did" id="profileDid">No cryptographic identity connected</div></div><button id="identityInfo" type="button" aria-label="Identity status">Identity</button></div>
+</header>
+<nav class="tabs" id="tabs" aria-label="Browser tabs"><button id="newTab" type="button" aria-label="Open new tab">＋ New tab</button></nav>
+<div class="toolbar" role="toolbar" aria-label="Navigation controls">
+  <button id="back" type="button" title="Back" aria-label="Back">←</button><button id="forward" type="button" title="Forward" aria-label="Forward">→</button><button id="reload" type="button" title="Reload" aria-label="Reload">↻</button>
+  <form class="address" id="navigateForm"><input id="address" aria-label="Address or search" autocomplete="url" spellcheck="false" placeholder="Enter a URL, search, or supported Web4 reference"></form>
+  <button id="bookmark" type="button" title="Bookmark this page" aria-label="Bookmark">☆</button><button id="go" type="submit" form="navigateForm">Go</button>
+</div>
+<div class="layout">
+  <aside class="side" aria-label="Browser sidebar">
+    <section><div class="eyebrow">Identity context</div><select class="profile" id="profileSelect" aria-label="Choose local profile"><option value="personal">Personal Core</option><option value="work">Sovereign Work</option><option value="shadow">Ephemeral Shadow</option></select><p class="help">Changes local UI context only. No DID or wallet is created.</p></section>
+    <section><div class="eyebrow">Quick navigation</div><div class="link-list"><button class="link-item" data-target="home:web4">⌂ <span>Web4 home</span></button><button class="link-item" data-target="https://ipfs.tech">◇ <span>IPFS project</span></button><button class="link-item" data-target="https://github.com/web4hub">⌘ <span>Web4 on GitHub</span></button></div></section>
+    <section><div class="eyebrow">Bookmarks</div><div class="link-list" id="bookmarks"><span class="help">No bookmarks yet.</span></div></section>
+    <section class="secondary"><div class="eyebrow">Recent history</div><div class="link-list" id="historyList"><span class="help">No pages visited yet.</span></div></section>
+    <section class="secondary"><div class="eyebrow">Trust boundary</div><p class="help">Pages open in a sandboxed iframe. Some sites block embedding or require browser features this prototype cannot provide.</p><p class="help">Wallet signing, decentralized identity verification, encrypted storage, and real IPFS name resolution are not implemented.</p></section>
+  </aside>
+  <main class="content" id="viewport" aria-label="Browser viewport"></main>
+</div>
+<footer class="status"><span id="statusText" role="status" aria-live="polite">Ready · local-only prototype</span><span id="historyStatus">0 entries</span></footer>
+<script>
+(function(){
+"use strict";
+const profiles={
+ personal:{name:"Personal Core",description:"Everyday browsing context",accent:"#48d9ed"},
+ work:{name:"Sovereign Work",description:"Work-oriented browsing context",accent:"#a78bfa"},
+ shadow:{name:"Ephemeral Shadow",description:"Separate local browsing context; not anonymity",accent:"#ff7385"}
+};
+const tabs=[];let activeId=null;let nextId=1;let activeProfile="personal";
+const $=id=>document.getElementById(id);
+const safeText=value=>String(value??"");
+function status(message){$("statusText").textContent=message}
+function current(){return tabs.find(t=>t.id===activeId)}
+function createTab(target="home:web4"){
+ const tab={id:nextId++,title:"New tab",history:[],index:-1,bookmarks:[],pageType:"home",target:"home:web4",frame:null};
+ tabs.push(tab);activeId=tab.id;renderTabs();navigate(target,true);return tab;
+}
+function renderTabs(){
+ const host=$("tabs");host.replaceChildren();
+ tabs.forEach(tab=>{
+  const button=document.createElement("button");button.type="button";button.className="tab"+(tab.id===activeId?" active":"");button.setAttribute("aria-current",tab.id===activeId?"page":"false");
+  const title=document.createElement("span");title.className="tab-title";title.textContent=tab.title;
+  const close=document.createElement("span");close.className="close";close.textContent="×";close.setAttribute("role","button");close.setAttribute("aria-label","Close "+tab.title);
+  close.addEventListener("click",event=>{event.stopPropagation();closeTab(tab.id)});
+  button.append(title,close);button.addEventListener("click",()=>{activeId=tab.id;renderAll()});host.appendChild(button);
+ });
+ const add=document.createElement("button");add.type="button";add.id="newTab";add.textContent="＋";add.setAttribute("aria-label","Open new tab");add.addEventListener("click",()=>createTab());host.appendChild(add);
+}
+function closeTab(id){
+ const index=tabs.findIndex(t=>t.id===id);if(index<0)return;
+ tabs.splice(index,1);
+ if(!tabs.length){createTab();return}
+ if(activeId===id)activeId=tabs[Math.max(0,index-1)].id;
+ renderAll();
+}
+function resolveTarget(raw){
+ const value=raw.trim();if(!value)throw new Error("Enter a URL, search term, or supported reference.");
+ if(value==="home:web4")return {kind:"home",target:value,title:"Web4 Home"};
+ if(/^ipfs:\/\//i.test(value)){
+  const cid=value.slice(7).split(/[/?#]/)[0];
+  if(!cid||! /^[a-zA-Z0-9]+$/.test(cid))throw new Error("Invalid IPFS content identifier.");
+  return {kind:"web",target:"https://ipfs.io/ipfs/"+encodeURIComponent(cid),title:"IPFS · "+cid.slice(0,18),notice:"IPFS reference is opened through a public gateway. This is not native IPFS resolution."};
+ }
+ if(/^(did:|storage:|matrix:|git:|smartcontract:|ram:|onion:)/i.test(value)){
+  return {kind:"internal",target:value,title:value.slice(0,36),notice:"This Web4-style reference is displayed as a local placeholder; no resolver or ledger is connected."};
+ }
+ let url;
+ if(/^https?:\/\//i.test(value)){url=new URL(value)}
+ else if(/^[a-z][a-z0-9+.-]*:/i.test(value))throw new Error("Only HTTP(S), IPFS gateway links, and local Web4 reference placeholders are supported.");
+ else if(value.includes(".")&&!/\s/.test(value)){url=new URL("https://"+value)}
+ else{url=new URL("https://duckduckgo.com/?q="+encodeURIComponent(value))}
+ if(url.protocol!=="https:"&&url.protocol!=="http:")throw new Error("Only HTTP and HTTPS website URLs are allowed.");
+ return {kind:"web",target:url.href,title:url.hostname,notice:"External page. Its scripts and network requests remain subject to browser and iframe restrictions."};
+}
+function navigate(raw,replace=false){
+ const tab=current();if(!tab)return;
+ let resolved;
+ try{resolved=resolveTarget(raw)}catch(error){status(error.message);return}
+ if(!replace&&tab.index<tab.history.length-1)tab.history=tab.history.slice(0,tab.index+1);
+ const entry={...resolved,profile:activeProfile,at:Date.now()};
+ if(replace&&tab.index>=0)tab.history[tab.index]=entry;else{tab.history.push(entry);tab.index=tab.history.length-1}
+ showEntry(tab,entry);renderTabs();renderSideLists();updateNav();$("address").value=resolved.target;status("Opened "+resolved.title);
+}
+function showEntry(tab,entry){
+ tab.title=entry.title||"Web4";tab.target=entry.target;tab.pageType=entry.kind;
+ const host=$("viewport");host.replaceChildren();
+ if(entry.kind==="web"){
+  const page=document.createElement("section");page.className="page active";
+  const frame=document.createElement("iframe");frame.title="External website: "+entry.title;frame.referrerPolicy="no-referrer";frame.loading="eager";frame.setAttribute("sandbox","allow-forms allow-scripts allow-popups");frame.src=entry.target;
+  page.appendChild(frame);host.appendChild(page);tab.frame=frame;
+  frame.addEventListener("load",()=>{if(current()?.id===tab.id)status("Loaded frame · "+entry.title+" (site may restrict embedding)")});
+ }else{
+  const home=document.createElement("div");home.className="home";
+  const card=document.createElement("div");card.className="home-card";
+  const badge=document.createElement("span");badge.className="tag";badge.textContent=entry.kind==="internal"?"UNRESOLVED WEB4 REFERENCE":"SOVEREIGN WORKSPACE";
+  const h=document.createElement("h1");h.textContent=entry.kind==="internal"?"Reference placeholder":"Your Web4 starting point";
+  const p=document.createElement("p");p.textContent=entry.kind==="internal"?"This prototype does not resolve custom schemes or connect to a DID registry, wallet, ledger, or private network. The reference is shown as text only.":"A browser interface experiment focused on profile context, transparent trust boundaries, and user-controlled navigation.";
+  const notice=document.createElement("div");notice.className="notice";notice.textContent=entry.notice||"Identity is not authenticated. This demo does not generate cryptographic proofs or sign requests.";
+  const quick=document.createElement("div");quick.className="quick";
+  [["Search the web","AI browser architecture"],["Open GitHub","https://github.com/web4hub"],["Explore IPFS","https://ipfs.tech"]].forEach(([label,target])=>{const b=document.createElement("button");b.type="button";b.textContent=label;b.addEventListener("click",()=>navigate(target));quick.appendChild(b)});
+  card.append(badge,h,p,notice,quick);home.appendChild(card);host.appendChild(home);tab.frame=null;
+ }
+}
+function goBack(){const t=current();if(t&&t.index>0){t.index--;showEntry(t,t.history[t.index]);$("address").value=t.target;renderTabs();updateNav();renderSideLists();status("Back · "+t.title)}}
+function goForward(){const t=current();if(t&&t.index<t.history.length-1){t.index++;showEntry(t,t.history[t.index]);$("address").value=t.target;renderTabs();updateNav();renderSideLists();status("Forward · "+t.title)}}
+function reload(){const t=current();if(!t)return;const e=t.history[t.index];if(!e)return;if(e.kind==="web"&&t.frame){t.frame.src=e.target;status("Reloading "+e.title)}else{showEntry(t,e);status("Refreshed local view")}}
+function updateNav(){const t=current();$("back").disabled=!t||t.index<=0;$("forward").disabled=!t||t.index>=t.history.length-1;$("bookmark").textContent=t&&t.history[t.index]&&t.bookmarks.some(b=>b.target===t.target)?"★":"☆";$("historyStatus").textContent=t?(t.index+1)+" / "+t.history.length+" in tab · "+tabs.length+" tabs":"No active tab"}
+function renderSideLists(){
+ const bm=$("bookmarks");bm.replaceChildren();let items=[];
+ tabs.forEach(t=>t.bookmarks.forEach(b=>{if(!items.some(x=>x.target===b.target))items.push(b)}));
+ if(!items.length){const p=document.createElement("p");p.className="help";p.textContent="No bookmarks yet.";bm.appendChild(p)}
+ items.slice(-8).forEach(item=>{const b=document.createElement("button");b.className="link-item";b.type="button";b.textContent="☆ "+item.title;b.title=item.target;b.addEventListener("click",()=>navigate(item.target));bm.appendChild(b)});
+ const hist=$("historyList");hist.replaceChildren();const entries=[];tabs.forEach(t=>t.history.forEach(e=>entries.push(e)));
+ if(!entries.length){const p=document.createElement("p");p.className="help";p.textContent="No pages visited yet.";hist.appendChild(p)}
+ entries.slice(-8).reverse().forEach(item=>{const b=document.createElement("button");b.className="link-item";b.type="button";b.textContent="↗ "+item.title;b.title=item.target;b.addEventListener("click",()=>navigate(item.target));hist.appendChild(b)});
+}
+function renderAll(){renderTabs();const t=current();if(t){const entry=t.history[t.index];if(entry){showEntry(t,entry);$("address").value=entry.target}else{$("address").value=""}}updateNav();renderSideLists();updateIdentity()}
+function updateIdentity(){
+ const p=profiles[activeProfile];document.documentElement.style.setProperty("--accent",p.accent);$("profileName").textContent=p.name;$("profileDid").textContent="No cryptographic identity connected";$("profileSelect").value=activeProfile;
+}
+$("navigateForm").addEventListener("submit",event=>{event.preventDefault();navigate($("address").value)});
+$("back").addEventListener("click",goBack);$("forward").addEventListener("click",goForward);$("reload").addEventListener("click",reload);
+$("bookmark").addEventListener("click",()=>{const t=current(),e=t?.history[t.index];if(!t||!e)return;if(!t.bookmarks.some(b=>b.target===e.target))t.bookmarks.push({target:e.target,title:e.title});renderSideLists();updateNav();status("Bookmark saved in this page session only")});
+$("profileSelect").addEventListener("change",event=>{activeProfile=event.target.value;updateIdentity();status("Switched local profile context · no identity credentials changed");});
+$("identityInfo").addEventListener("click",()=>{status("No wallet connected · no DID verification or cryptographic signing available");alert("Web4 identity status\n\nThis is a UI prototype. No decentralized identifier is authenticated, no private key is stored, and no wallet request is signed.");});
+$("tabs").addEventListener("click",event=>{const item=event.target.closest("[data-target]");if(item)navigate(item.dataset.target)});
+document.querySelectorAll("[data-target]").forEach(button=>button.addEventListener("click",()=>navigate(button.dataset.target)));
+$("newTab").addEventListener("click",()=>createTab());
+updateIdentity();createTab();
+})();
+</script>
+</body>
+</html>
