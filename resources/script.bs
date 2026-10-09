@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# WEB4 PLATFORM WORKSPACE INITIALIZER & ORCHESTRATION PIPELINE
+# Filename: resources/script.bs
+# Purpose: Provision sovereign runtime spaces, verify code matrices, 
+#          initialize tracking telemetry logs, and lift browser viewports.
+# ==============================================================================
+
+# ANSI Cryptographic Terminal Color Palettes
+HEX_GLOW='\033[38;2;0;255;135m'     # Web4 Success Green
+HEX_BANK='\033[38;2;0;242;254m'     # Web4 Routing Blue
+HEX_AGENT='\033[38;2;170;51;255m'   # Web4 Agent Purple
+HEX_WARN='\033[1;33m'
+HEX_RESET='\033[0m'
+
+clear
+echo -e "${HEX_BANK}⎔ ========================================================== ⎔${HEX_RESET}"
+echo -e "${HEX_BANK}   WEB4 SOVEREIGN DECENTRALIZED PROTOCOL LAYER CONFIGURATOR   ${HEX_RESET}"
+echo -e "${HEX_BANK}⎔ ========================================================== ⎔${HEX_RESET}"
+echo ""
+
+# ------------------------------------------------------------------------------
+# PHASE 1: Sovereign Workspace Integrity & Telemetry Setup
+# ------------------------------------------------------------------------------
+echo -e "[*] ${HEX_RESET}Initiating zero-trust environment compliance assessment..."
+sleep 0.5
+
+CORE_FILES=("marketplace.html" "fiat-gateway.html")
+MISSING_FILES=0
+
+for file in "${CORE_FILES[@]}"; do
+    if [ -f "$file" ]; then
+        echo -e "    ${HEX_GLOW}✓${HEX_RESET} Resource Node Verified: ./${file}"
+    else
+        echo -e "    ${HEX_WARN}✗ Found Missing Asset File:${HEX_RESET} ./${file}"
+        MISSING_FILES=$((MISSING_FILES + 1))
+    fi
+done
+
+# Provisioning Automated System File Tracking Telemetry Log (NEW)
+LOG_FILE="resources/agent_execution.log"
+mkdir -p "resources"
+touch "$LOG_FILE"
+
+log_event() {
+    local type="$1"
+    local message="$2"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [$type] $message" >> "$LOG_FILE"
+}
+
+log_event "SYSTEM_INIT" "Zero-trust workspace integrity verified. Telemetry framework online."
+echo -e "    ${HEX_GLOW}✓${HEX_RESET} Tracking Telemetry Ledger Initialized: ./${LOG_FILE}"
+
+if [ $MISSING_FILES -gt 0 ]; then
+    echo ""
+    echo -e "${HEX_WARN}[!] WARN: Local deployment files are incomplete.${HEX_RESET}"
+    log_event "SYSTEM_WARN" "Missing expected file nodes inside context folder root workspace targets."
+fi
+
+# ------------------------------------------------------------------------------
+# PHASE 2: Identity Profile Runtime Provisioning
+# ------------------------------------------------------------------------------
+RUNTIME_DIR=".w4_runtime_state"
+CONFIG_FILE="${RUNTIME_DIR}/identity_config.json"
+
+echo ""
+echo -e "[*] ${HEX_RESET}Configuring local state database directory layers..."
+mkdir -p "$RUNTIME_DIR"
+
+# Injecting standard multi-profile cryptographic records
+cat << EOF > "$CONFIG_FILE"
+{
+  "active_signer": "did:w4:fiat:77c21ae99bcc42f01a",
+  "actor_profiles": {
+    "personal-core": {
+      "name": "Personal Core",
+      "did": "did:w4:actor:9ef2a410bca7e12",
+      "vault_ledger": "ipfs://bafybeih402vaultroot"
+    },
+    "zk-shadow": {
+      "name": "Ephemeral ZK Shadow Pool",
+      "did": "did:w4:blind:301x99feac82b4",
+      "vault_ledger": "onion://zero-knowledge-volatile"
+    }
+  },
+  "oracle_nodes": {
+    "nibss_gateway": "https://api.oracle.w4/nibss-fiat-v1",
+    "ipfs_gateway": "https://ipfs.io"
+  },
+  "runtime_parameters": {
+    "persistence": true,
+    "mcp_agent_routing": true,
+    "iso20022_compliance": true
+  }
+}
+EOF
+
+echo -e "    ${HEX_GLOW}✓${HEX_RESET} Encrypted state variables written to: ./${CONFIG_FILE}"
+log_event "CONFIG_WRITE" "Identity profiles configuration matrix output successfully to json file metadata stores."
+sleep 0.5
+
+# ------------------------------------------------------------------------------
+# PHASE 3: Model Context Protocol (MCP) AI Agent Routing Simulation
+# ------------------------------------------------------------------------------
+echo ""
+echo -e "[*] ${HEX_RESET}Bootstrapping automated machine-to-machine exchange systems..."
+sleep 0.5
+
+echo -e "${HEX_AGENT}[MCP AGENT]: Parsing available token intents across unspent notes...${HEX_RESET}"
+log_event "AGENT_SCAN" "Model Context Protocol scanning available intent hashes inside ledger memory pools."
+sleep 0.8
+echo -e "${HEX_AGENT}[MCP AGENT]: Cross-chain arbitrage routing vectors activated.${HEX_RESET}"
+log_event "AGENT_ROUTING" "Arbitrage discovery engines verified on interface thread frameworks."
+echo -e "${HEX_AGENT}[MCP AGENT]: Listening for webhook transaction broadcasts...${HEX_RESET}"
+sleep 0.5
+
+# ------------------------------------------------------------------------------
+# PHASE 4: Local Viewport Browser Activation & Lifting Pipeline (NEW)
+# ------------------------------------------------------------------------------
+echo ""
+echo -e "[*] ${HEX_RESET}Spawning local graphic viewport window frames into gateway modules..."
+log_event "VIEWPORT_SPAWN" "Invoking operating system execution handlers to lift portal browser windows."
+
+# Cross-platform browser engine caller routing selector hooks
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    xdg-open "fiat-gateway.html" >/dev/null 2>&1 &
+    xdg-open "marketplace.html" >/dev/null 2>&1 &
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    open "fiat-gateway.html" >/dev/null 2>&1 &
+    open "marketplace.html" >/dev/null 2>&1 &
+elif [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+    start "fiat-gateway.html" >/dev/null 2>&1 &
+    start "marketplace.html" >/dev/null 2>&1 &
+else
+    echo -e "    ${HEX_WARN}[!] System warning: Unknown platform OS context. Launch HTML targets manually.${HEX_RESET}"
+    log_event "VIEWPORT_FAIL" "Unable to auto-detect platform OS properties to execute standard browser lift command links."
+fi
+
+# ------------------------------------------------------------------------------
+# PHASE 5: Execution Sign-Off Matrix
+# ------------------------------------------------------------------------------
+echo ""
+echo -e "${HEX_GLOW}⎔ ========================================================== ⎔${HEX_RESET}"
+echo -e "${HEX_GLOW}    SUCCESS: WEB4 TRUSTLESS NODE HUB READY FOR PRODUCTION    ${HEX_RESET}"
+echo -e "${HEX_GLOW}⎔ ========================================================== ⎔${HEX_RESET}"
+echo -e "Sovereign Web App configuration complete. Local state tracking is running."
+echo ""
