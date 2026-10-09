@@ -80,7 +80,7 @@
           <h2 class="h6 mb-3"><i class="bi bi-arrow-left-right text-info me-2"></i>Compose trade intent</h2>
           <form id="intentForm">
             <div class="mb-3"><label for="tradeDirection" class="form-label small text-secondary">Intent direction</label><select class="form-select" id="tradeDirection"><option value="BUY">Acquire selected asset</option><option value="SELL">Offer selected asset</option></select></div>
-            <div class="mb-3"><label for="tradeToken" class="form-label small text-secondary">Asset</label><select class="form-select" id="tradeToken"><option value="W4">W4 · Native utility token</option><option value="WETH">WETH · Wrapped Ether (demo)</option><option value="ZKP">ZKP · Privacy utility (demo)</option></select></div>
+            <div class="mb-3"><label for="tradeToken" class="form-label small text-secondary">Asset</label><select class="form-select" id="tradeToken"><option value="W4" disabled>W4 · Quote asset (not directly tradable)</option><option value="WETH" selected>WETH · Wrapped Ether (demo)</option><option value="ZKP">ZKP · Privacy utility (demo)</option></select></div>
             <div class="mb-3"><label for="tradeAmount" class="form-label small text-secondary">Quantity</label><input class="form-control mono" id="tradeAmount" type="number" min="0.000001" step="any" value="10" required><div class="form-text">Must be greater than zero and within the demo profile's available balance for sells.</div></div>
             <div class="mb-3"><div class="d-flex justify-content-between align-items-center"><label for="maxSlippage" class="form-label small text-secondary mb-1">Maximum slippage</label><strong class="mono small" id="slippageLabel">0.50%</strong></div><input class="form-range" id="maxSlippage" type="range" min="0.1" max="5" step="0.1" value="0.5"><div class="d-flex justify-content-between text-secondary" style="font-size:.7rem"><span>0.1%</span><span>5.0%</span></div></div>
             <div class="notice mb-3" id="tradePreview">Estimated notional: $12.40 · Demo estimate only.</div>
@@ -126,11 +126,8 @@
     personal:{label:"did:w4:trader:88ba",vault:cloneVault()},
     "zk-shadow":{label:"did:w4:blind:301x",vault:{W4:{balance:180,price:1.24,prefix:"⎔"},WETH:{balance:0.35,price:2840.50,prefix:"Ξ"},ZKP:{balance:42,price:8.75,prefix:"🛡"}}}
   };
-  const seedIntents = [
-    {id:"w4-intent-77a",profile:"personal",asset:"W4",dir:"BUY",qty:500,state:"Matching",slippage:0.5},
-    {id:"w4-intent-12f",profile:"personal",asset:"ZKP",dir:"SELL",qty:25,state:"Awaiting Approval",slippage:0.5},
-    {id:"w4-intent-90c",profile:"zk-shadow",asset:"WETH",dir:"BUY",qty:1.5,state:"Settled (simulated)",slippage:0.5}
-  ];
+  // Start with an empty pipeline; never present fabricated orders as existing activity.
+  const seedIntents = [];
   let intents = seedIntents.map(x=>({...x}));
   let selectedIntentId = null;
   let idCounter = 100;
@@ -223,7 +220,7 @@
     event.preventDefault();
     const direction=$("tradeDirection").value,symbol=$("tradeToken").value,amount=Number($("tradeAmount").value),slippage=Number($("maxSlippage").value);
     if(!Number.isFinite(amount)||amount<=0){alert("Enter a quantity greater than zero.");return;}
-    if(!initialVault[symbol]){alert("Select a supported demo asset.");return;}
+    if(!initialVault[symbol]||symbol==="W4"){alert("Choose WETH or ZKP. W4 is the demo quote asset and cannot be traded against itself.");return;}
     if(direction==="SELL"&&token(symbol).balance<amount){alert("Insufficient demo balance in the active profile.");return;}
     const intent={id:makeId(),profile:profileKey(),asset:symbol,dir:direction,qty:amount,state:"Awaiting Approval",slippage};
     intents.unshift(intent);selectedIntentId=intent.id;
@@ -239,7 +236,7 @@
   function settleIntent(id){
     const intent=intents.find(i=>i.id===id);if(!intent||intent.profile!==profileKey()||intent.state!=="Awaiting Approval")return;
     const activeVault=profiles[intent.profile].vault;
-    const amount=intent.qty,symbol=intent.asset,price=initialVault[symbol].price;
+    const amount=intent.qty,symbol=intent.asset,price=initialVault[intent.asset]?.price;\n    if(symbol==="W4"||!Number.isFinite(price)){intent.state="Failed";log("Intent "+id+" failed: unsupported quote-asset trade.");refresh();return;}
     if(intent.dir==="SELL"&&activeVault[symbol].balance<amount){intent.state="Failed";log("Intent "+id+" failed: insufficient balance at approval.");refresh();return;}
     const estimatedImpact=amount*price*(intent.slippage/100);
     if(intent.dir==="SELL"){activeVault[symbol].balance-=amount;activeVault.W4.balance+=amount*price/initialVault.W4.price;}
