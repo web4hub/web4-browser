@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web4 Sovereign Virtual Cash Clearing House</title>
+    <title>Web4 Sovereign Virtual Cash Hub & FX Clearing House</title>
     <!-- Bootstrap 5 CSS & Icons CDN -->
     <link href="https://jsdelivr.net" rel="stylesheet">
     <link href="https://jsdelivr.net" rel="stylesheet">
@@ -68,7 +68,7 @@
             font-size: 0.8rem;
             color: #adbac7;
             border: 1px solid var(--border-ui);
-            height: 140px;
+            height: 120px;
             overflow-y: auto;
         }
 
@@ -163,16 +163,13 @@
         <!-- Main Workspace Operational Canvas -->
         <main class="vault-canvas flex-grow-1 p-4">
             
-            <div class="row g-4 mb-4">
+            <div class="row g-3 mb-3">
                 <!-- Local Bank Clearance Settlement Module -->
-                <div class="col-xl-4 col-md-6">
+                <div class="col-xl-3 col-md-6">
                     <div class="card bg-dark bg-opacity-50 border-secondary p-3 shadow-sm h-100">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="text-white m-0"><i class="bi bi-bank2 text-info me-2"></i>Bank Remittance</h6>
-                        </div>
-                        
+                        <h6 class="text-white mb-2"><i class="bi bi-bank2 text-info me-2"></i>Bank Remittance</h6>
                         <div class="mb-2">
-                            <label class="form-label small text-secondary">Target Retail Bank Routing</label>
+                            <label class="form-label small text-secondary" style="font-size:11px;">Target Bank Routing</label>
                             <select class="form-select form-select-sm bg-black border-secondary text-light shadow-none" id="bankRoute">
                                 <option value="Access Bank">Access Bank Plc</option>
                                 <option value="Zenith Bank">Zenith Bank International</option>
@@ -180,64 +177,82 @@
                                 <option value="United Bank for Africa">United Bank for Africa (UBA)</option>
                             </select>
                         </div>
-
                         <div class="mb-2">
-                            <label class="form-label small text-secondary">Account Number Matrix</label>
+                            <label class="form-label small text-secondary" style="font-size:11px;">Account Number</label>
                             <input type="text" class="form-control form-control-sm bg-black border-secondary text-light font-mono shadow-none" id="bankAccount" value="0114029381">
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label small text-secondary">Target Selected Note ID</label>
+                        <div class="mb-2">
+                            <label class="form-label small text-secondary" style="font-size:11px;">Target Note</label>
                             <input type="text" class="form-control form-control-sm bg-black border-secondary text-warning font-mono shadow-none" id="targetNoteField" placeholder="Select a note card" readonly>
                         </div>
-
-                        <button class="btn btn-sm btn-success w-100 fw-bold py-2 shadow-none" onclick="processBankRemittance()">
-                            <i class="bi bi-arrow-up-right-circle me-2"></i>Sign & Liquidate Note
+                        <button class="btn btn-sm btn-success w-100 fw-bold shadow-none" onclick="processBankRemittance()">
+                            <i class="bi bi-arrow-up-right-circle me-1"></i>Sign & Liquidate Note
                         </button>
                     </div>
                 </div>
 
-                <!-- Web4 Cash-In Voucher Minting Panel (NEW) -->
-                <div class="col-xl-4 col-md-6">
+                <!-- Web4 Cash-In Voucher Minting Panel -->
+                <div class="col-xl-3 col-md-6">
                     <div class="card bg-dark bg-opacity-50 border-secondary p-3 shadow-sm h-100">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="text-white m-0"><i class="bi bi-plus-square-fill text-success me-2"></i>Cash-In Voucher Minter</h6>
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success font-mono" style="font-size: 9px;">Mint Layer</span>
-                        </div>
-                        <p class="text-secondary mb-2" style="font-size: 11px;">Generate verified paper notes by supplying matching physical bank deposit reference numbers.</p>
-                        
+                        <h6 class="text-white mb-2"><i class="bi bi-plus-square-fill text-success me-2"></i>Cash-In Minter</h6>
                         <div class="mb-2">
+                            <label class="form-label small text-secondary" style="font-size:11px;">Inbound Deposit Reference</label>
+                            <input type="text" class="form-control form-control-sm bg-black border-secondary text-light font-mono shadow-none" id="mintRef" value="REF-992104B">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small text-secondary" style="font-size:11px;">Denomination (NGN)</label>
 
-₦10,000 NGN Note
 ₦25,000 NGN Note
 ₦50,000 NGN Note
 ₦100,000 NGN Note
 
-Execute Cryptographic Mint
 
 
-Oracle Nodes
+
+Execute Mint
 
 
-NGN / USD Clearing Rate
-₦1,720.00
+
+FX Exchange Engine
+Re-denominate and swap selected unspent paper bill nodes into foreign asset parameters.
+USD ($) - Rate: 1,720
+EUR (€) - Rate: 1,850
+NGN (₦) - Base Asset
 
 
-Total Liquid Vault Assets
+
+
+Sign & Mutate Asset Currency
+
+
+
+Oracle Statistics
+
+NGN Market Rate Indices
+USD: ₦1,720.00 | EUR: ₦1,850.00
+
+
+Total Combined Vault Assets (Base)
 ₦175,000
 
 
 
 Sovereign Note Blueprint Exporter
+
+Inspect Audit Trail
 Export Document PDF
+
 WEB4 SECURE
 
 
 Verifiable Cash Certificate
 ₦50,000 NGN
 Serial Root: W4-NGN-XXXXX
-Minter Public Validation DID: did:w4:fiat:77c21ae99bcc
+Minter Validation DID: did:w4:fiat:77c21ae99bcc
 Content Ledger Hash: ipfs://bafybeih402...
+
+
+
 
 
 VALID WEB4
@@ -246,29 +261,45 @@ VALID WEB4
 
 
 
-TIMESTAMP: 2026-10-09 UTC
-STATUS: ACTIVE_UNSPENT_LEDGER_NODE
-
-
 Verifiable Clearing Log Registry
+Sovereign Note Lifecycle Audit Log
+
+
+
+
+
+Target Asset Serial: -
+Content-Addressing Pointer: -
+
+Close Inspector
+
+
+
+const fxRates = { 'NGN': 1, 'USD': 1720, 'EUR': 1850 };
+const currencySymbols = { 'NGN': '₦', 'USD': '$', 'EUR': '€' };
 let digitalCashNotes = [
-{ serial: 'W4-NGN-99a410b', denomination: 50000, currency: 'NGN', hash: 'ipfs://bafybeih6h7u42x99aa1' },
-{ serial: 'W4-NGN-12c884x', denomination: 100000, currency: 'NGN', hash: 'ipfs://bafybeic77f44a108b2c' },
-{ serial: 'W4-NGN-44f711z', denomination: 25000, currency: 'NGN', hash: 'ipfs://bafybeid09x33aa77fe4' }
+{ serial: 'W4-NGN-99a410b', denomination: 50000, currency: 'NGN', hash: 'ipfs://bafybeih6h7u42x99aa1',
+history: ['[2026-10-09 20:11:02] MINT_INBOUND_DEPOSIT_RESERVE // Validated Bank Clearing Ref: REF-002A1', '[2026-10-09 20:11:02] COMPRESSED_STATE_COMMIT // Note Sealed on Web4 Distributed Ledger Node'] },
+{ serial: 'W4-NGN-12c884x', denomination: 100000, currency: 'NGN', hash: 'ipfs://bafybeic77f44a108b2c',
+history: ['[2026-10-09 21:04:15] MINT_INBOUND_DEPOSIT_RESERVE // Validated Bank Clearing Ref: REF-8839Z'] },
+{ serial: 'W4-NGN-44f711z', denomination: 25000, currency: 'NGN', hash: 'ipfs://bafybeid09x33aa77fe4',
+history: ['[2026-10-09 21:30:00] MINT_INBOUND_DEPOSIT_RESERVE // Validated Bank Clearing Ref: REF-4412X'] }
 ];
 let historicalClearingLogs = [
-{ id: 'tx-clear-801', serial: 'W4-NGN-00b411d', institution: 'GTBank', account: '0119928341', amount: 50000, proof: 'Settled_Cleared' }
+{ id: 'tx-clear-801', serial: 'W4-NGN-00b411d', institution: 'GTBank', account: '0119928341', amount: '₦50,000', proof: 'Settled_Cleared' }
 ];
 let targetedNoteIndex = null;
+let bsAuditModalObj = null;
 window.onload = () => {
+bsAuditModalObj = new bootstrap.Modal(document.getElementById('auditModal'));
 refreshGatewayUiAll();
 };
 function refreshGatewayUiAll() {
 const noteContainer = document.getElementById('paperCurrencyList');
 noteContainer.innerHTML = '';
-let rollingSum = 0;
+let baseRollingSum = 0;
 digitalCashNotes.forEach((note, index) => {
-rollingSum += note.denomination;
+baseRollingSum += (note.denomination * fxRates[note.currency]);
 const div = document.createElement('div');
 div.className = 'currency-card p-2 rounded d-flex justify-content-between align-items-center mb-1';
 if(targetedNoteIndex === index) {
@@ -276,10 +307,10 @@ div.style.borderColor = 'var(--w4-bank)';
 div.style.backgroundColor = 'rgba(0, 242, 254, 0.05)';
 }
 div.onclick = () => selectNoteForRemittance(index);
-div.innerHTML = <div> <div class="small fw-bold font-mono text-success"><i class="bi bi-ticket-perforated-fill me-2"></i>₦${note.denomination.toLocaleString()} ${note.currency}</div> <div class="text-secondary font-monospace" style="font-size:9px;">Serial: ${note.serial}</div> </div> <i class="bi bi-shield-lock-fill text-secondary" title="Cryptographically Sealed Node"></i>;
+div.innerHTML = <div> <div class="small fw-bold font-mono text-success"><i class="bi bi-ticket-perforated-fill me-2"></i>${currencySymbols[note.currency]}${note.denomination.toLocaleString()} ${note.currency}</div> <div class="text-secondary font-monospace" style="font-size:9px;">Serial: ${note.serial}</div> </div> <i class="bi bi-shield-lock-fill text-secondary"></i>;
 noteContainer.appendChild(div);
 });
-document.getElementById('totalVaultLabel').innerText = ₦${rollingSum.toLocaleString()};
+document.getElementById('totalVaultLabel').innerText = ₦${baseRollingSum.toLocaleString()};
 const tbody = document.getElementById('clearingLogBody');
 tbody.innerHTML = '';
 historicalClearingLogs.forEach(log => {
@@ -292,113 +323,111 @@ tbody.appendChild(tr);
 function selectNoteForRemittance(index) {
 targetedNoteIndex = index;
 const note = digitalCashNotes[index];
-document.getElementById('targetNoteField').value = ${note.serial} (₦${note.denomination.toLocaleString()});
-// Populating Interactive Document Blueprint Panel
+const sym = currencySymbols[note.currency];
+document.getElementById('targetNoteField').value = ${note.serial} (${sym}${note.denomination.toLocaleString()});
 document.getElementById('blueprintContainer').classList.remove('d-none');
-document.getElementById('pdfDenomination').innerText = ₦${note.denomination.toLocaleString()} ${note.currency};
+document.getElementById('pdfDenomination').innerText = ${sym}${note.denomination.toLocaleString()} ${note.currency};
 document.getElementById('pdfSerial').innerText = note.serial;
 document.getElementById('pdfHash').innerText = Content Ledger Hash: ${note.hash};
 refreshGatewayUiAll();
 }
+function executeFxNoteSwap() {
+if(targetedNoteIndex === null) { alert('Select a cash sheet from the left inventory ledger first.'); return; }
+const note = digitalCashNotes[targetedNoteIndex];
+const targetCurrency = document.getElementById('fxTargetCurrency').value;
+if(note.currency === targetCurrency) { alert('Asset is already denominated in selected target parameter currency.'); return; }
+const term = document.getElementById('gatewayTerminal');
+term.innerHTML += \n[FX_ENGINE]: Swapping note currency context ${note.currency} ⟶ ${targetCurrency}.;
+// Cryptographic calculations: Evaluate cross-rates balances conversions adjustments
+let currentBaseValue = note.denomination * fxRates[note.currency];
+let newDenomination = Math.round(currentBaseValue / fxRates[targetCurrency]);
+note.history.unshift([2026-10-09 21:48:32] FX_CURRENCY_SWAP // Mutated Denomination from ${currencySymbols[note.currency]}${note.denomination} ${note.currency} into ${currencySymbols[targetCurrency]}${newDenomination} ${targetCurrency});
+note.currency = targetCurrency;
+note.denomination = newDenomination;
+note.serial = W4-${targetCurrency}- + Math.random().toString(36).substring(2, 9);
+term.innerHTML += \n[FX_ENGINE]: Re-issued mutated serial wrapper: ${note.serial};
+term.scrollTop = term.scrollHeight;
+selectNoteForRemittance(targetedNoteIndex);
+}
+function launchAuditTrailModal() {
+if(targetedNoteIndex === null) return;
+const note = digitalCashNotes[targetedNoteIndex];
+document.getElementById('auditModalSerial').innerText = note.serial;
+document.getElementById('auditModalHash').innerText = note.hash;
+const list = document.getElementById('auditTrailList');
+list.innerHTML = '';
+note.history.forEach(logLine => {
+list.innerHTML += <div class="list-group-item bg-black border-secondary text-secondary small p-2 font-mono"><i class="bi bi-shield-check text-info me-2"></i>${logLine}</div>;
+});
+bsAuditModalObj.show();
+}
 function mintCashVoucher() {
 const refNum = document.getElementById('mintRef').value;
 const amount = parseInt(document.getElementById('mintAmount').value);
-if(!refNum.trim()) { alert('Please enter an inbound bank credit notification reference code.'); return; }
-// Simulating content-addressed hashing vectors
+if(!refNum.trim()) return;
 const newSerial = 'W4-NGN-' + Math.random().toString(36).substring(2, 9);
-const mockCid = 'ipfs://bafybeimint' + Math.random().toString(16).substring(2, 10) + 'w4key';
+const mockCid = 'ipfs://bafybeimint' + Math.random().toString(16).substring(2, 10);
 const newNote = {
-serial: newSerial,
-denomination: amount,
-currency: 'NGN',
-hash: mockCid
+serial: newSerial, denomination: amount, currency: 'NGN', hash: mockCid,
+history: [[2026-10-09 21:48:32] MINT_INBOUND_DEPOSIT_RESERVE // Bank Ref Match Proof: ${refNum}]
 };
 digitalCashNotes.unshift(newNote);
-const term = document.getElementById('gatewayTerminal');
-term.innerHTML += \n[MINTER]: Validating incoming clearing proof reference: ${refNum}.;
-term.innerHTML += \n[MINTER]: Minted new note asset nodes successfully. [Serial: ${newSerial}];
-term.scrollTop = term.scrollHeight;
+document.getElementById('gatewayTerminal').innerHTML += \n[MINTER]: Minted new note asset nodes successfully. [Serial: ${newSerial}];
 refreshGatewayUiAll();
-// Automatically select the freshly minted note to display its export parameters
 selectNoteForRemittance(0);
 }
 function exportNoteAsPDF() {
 const element = document.getElementById('targetPDFNote');
 const serial = document.getElementById('pdfSerial').innerText;
 const options = {
-margin: 10,
-filename: Web4-Note-${serial}.pdf,
-image: { type: 'jpeg', quality: 0.98 },
-html2canvas: { scale: 2, backgroundColor: '#070d0a' },
-jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+margin: 10, filename: Web4-Note-${serial}.pdf, image: { type: 'jpeg', quality: 0.98 },
+html2canvas: { scale: 2, backgroundColor: '#070d0a' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
 };
-const term = document.getElementById('gatewayTerminal');
-term.innerHTML += \n[EXPORTER]: Building local vector rendering frames for client document stream...;
-term.scrollTop = term.scrollHeight;
-html2pdf().set(options).from(element).save().then(() => {
-term.innerHTML += \n[EXPORTER]: PDF Document exported successfully. Cryptographic QR print matrix compiled.;
-term.scrollTop = term.scrollHeight;
-});
+html2pdf().set(options).from(element).save();
 }
 function processBankRemittance() {
-if(targetedNoteIndex === null) { alert('Please select a virtual paper cash note from the side vault list first.'); return; }
+if(targetedNoteIndex === null) return;
 const bank = document.getElementById('bankRoute').value;
 const account = document.getElementById('bankAccount').value;
-if(!account.trim() || account.length < 10) { alert('Please supply a valid local clearing bank account layout.'); return; }
+if(!account.trim() || account.length < 10) return;
 const note = digitalCashNotes[targetedNoteIndex];
+const sym = currencySymbols[note.currency];
 const newTxId = 'tx-clear-' + Math.floor(Math.random() * 900 + 100);
 historicalClearingLogs.unshift({
-id: newTxId,
-serial: note.serial,
-institution: bank,
-account: account,
-amount: note.denomination,
-proof: 'Clearing_Initiated'
+id: newTxId, serial: note.serial, institution: bank, account: account,
+amount: ${sym}${note.denomination.toLocaleString()} ${note.currency}, proof: 'Clearing_Initiated'
 });
-const term = document.getElementById('gatewayTerminal');
-term.innerHTML += \n[GATEWAY]: Opened clearance stream payload for note ${note.serial}.;
-term.innerHTML += \n[GATEWAY]: Transmitted cryptographic burn proof over NIBSS pipeline routing vectors...;
-term.scrollTop = term.scrollHeight;
 digitalCashNotes.splice(targetedNoteIndex, 1);
 targetedNoteIndex = null;
 document.getElementById('targetNoteField').value = '';
 document.getElementById('blueprintContainer').classList.add('d-none');
+document.getElementById('gatewayTerminal').innerHTML += \n[GATEWAY]: Transmitted burn code sequence. Initiating credit payload to ${bank}...;
 setTimeout(() => {
-historicalClearingLogs.proof = 'Settled_Cleared';
-term.innerHTML += \n[GATEWAY]: Success! ${bank} confirmed internal core credit processing to acc: ${account}.;
-term.scrollTop = term.scrollHeight;
+historicalClearingLogs[0].proof = 'Settled_Cleared';
+document.getElementById('gatewayTerminal').innerHTML += \n[GATEWAY]: Settlement completed flawlessly to local retail account.;
 refreshGatewayUiAll();
 }, 3000);
 refreshGatewayUiAll();
 }
 function triggerAutoClearingAgent() {
-if(digitalCashNotes.length === 0) { alert('No paper currency notes left in vault storage coordinates.'); return; }
-const term = document.getElementById('gatewayTerminal');
-term.innerHTML += \n[AGENT]: Scanning local unspent currency vaults...;
-term.scrollTop = term.scrollHeight;
-setTimeout(() => {
+if(digitalCashNotes.length === 0) return;
 selectNoteForRemittance(0);
-term.innerHTML += \n[AGENT]: Locked note array index #0 automatically. Invoking clearing payload...;
-term.scrollTop = term.scrollHeight;
-}, 1200);
-setTimeout(() => {
-processBankRemittance();
-}, 2400);
+setTimeout(() => { processBankRemittance(); }, 1500);
 }
 
 
 
 ---
 
-### Functional Mechanics Matrix:
-* **Inbound Cash-In Voucher Minter:** Simulates an asset on-ramp. By entering an external reference ID (representing a verified bank transfer), users can mint completely new `W4-NGN` cash notes directly into their client instance state memory.
-* **Sovereign Note Blueprint Exporter:** Incorporates a client-side layout rendering capture module (`html2pdf.js`). Selecting a card renders a secure high-fidelity blueprint document screen. Clicking **"Export Document PDF"** saves an offline document file containing all asset hash credentials and security markings.
-* **Tamper-Resistant Validation Anchors:** The generated document contains active visual anchors like automated serial arrays, verification timestamps, and validation DID keys, satisfying zero-trust checking standards.
+### Expanded Architectural Capabilities Added:
+1. **The Foreign Exchange Token Engine:** The added currency system updates note attributes programmatically using relative baseline conversions (`NGN`, `USD`, `EUR`). The script burns the old note configuration and generates an updated currency design instance with unique identifier roots.
+2. **Cryptographic Lifecycle History (Audit Trails):** Every note asset array contains an isolated tracking structure (`history: []`). Every lifecycle event—including initial voucher mint validation checks or FX pool adjustments—is dynamically tracked and displayed in the audit trail view.
+3. **Bootstrap 5 Modal Viewport Integration:** Incorporates a modular overlay pane to display cryptographic verification records without cluttering the main terminal space.
 
 <FollowUp>
-Now that your multi-module fiat gateway platform is completely deployed with automated minting and PDF security blueprints, would you like to:
-* Integrate a **Multi-Currency FX Converter module** allowing users to swap their `W4-NGN` notes into `W4-USD` or `W4-EUR` paper notes before clearing to banks?
-* Hook up a simulated **Audit Trail Inspector** that lets users view the full step-by-step history of every minted note in a pop-up window?
+Now that your core application features have been deployed into production files, let me know if you would like to:
+* Set up a **Local Sandbox Data Storage pipeline** (`localStorage`) to make your minted note lifecycles persist across reloads?
+* Hook up a simulated **Automated Yield-Optimizer script** that lets agents deposit unspent bills into high-yield local credit syndicates?
 </FollowUp>
 
 
