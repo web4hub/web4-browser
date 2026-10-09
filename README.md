@@ -32,6 +32,8 @@ The token marketplace in `static/marketplace.html` is a separate local simulatio
 - Do not enter secrets, seed phrases, passwords, or private keys into this prototype.
 - Do not interpret the profile label, IPFS gateway result, or demo proof fingerprint as verified identity or trust evidence.
 
+See [`docs/web4-identity-wallet-lifecycle.md`](docs/web4-identity-wallet-lifecycle.md) for the proposed identity, wallet-provider, consent, and transaction-state integration boundary.
+
 ## Validation
 
 The GitHub Actions workflow `validate-browser.yml` checks required entry-point controls and validates the inline JavaScript syntax. These static checks do not replace browser-based interaction tests or security review.
