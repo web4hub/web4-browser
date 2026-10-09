@@ -81,7 +81,7 @@
           <form id="intentForm">
             <div class="mb-3"><label for="tradeDirection" class="form-label small text-secondary">Intent direction</label><select class="form-select" id="tradeDirection"><option value="BUY">Acquire selected asset</option><option value="SELL">Offer selected asset</option></select></div>
             <div class="mb-3"><label for="tradeToken" class="form-label small text-secondary">Asset</label><select class="form-select" id="tradeToken"><option value="W4" disabled>W4 · Native utility token (quote asset)</option><option value="WETH" selected>WETH · Wrapped Ether (demo)</option><option value="ZKP">ZKP · Privacy utility (demo)</option></select></div>
-            <div class="mb-3"><label for="tradeToken" class="form-label small text-secondary">Asset</label><select class="form-select" id="tradeToken"><option value="W4">W4 · Native utility token</option><option value="WETH">WETH · Wrapped Ether (demo)</option><option value="ZKP">ZKP · Privacy utility (demo)</option></select></div>
+            <div class="mb-3"><label for="tradeQuoteToken" class="form-label small text-secondary">Quote asset</label><select class="form-select" id="tradeQuoteToken"><option value="W4">W4 · Native utility token</option><option value="WETH">WETH · Wrapped Ether (demo)</option><option value="ZKP">ZKP · Privacy utility (demo)</option></select></div>
             <div class="mb-3"><label for="tradeAmount" class="form-label small text-secondary">Quantity</label><input class="form-control mono" id="tradeAmount" type="number" min="0.000001" step="any" value="10" required><div class="form-text">Must be greater than zero and within the demo profile's available balance for sells.</div></div>
             <div class="mb-3"><div class="d-flex justify-content-between align-items-center"><label for="maxSlippage" class="form-label small text-secondary mb-1">Maximum slippage</label><strong class="mono small" id="slippageLabel">0.50%</strong></div><input class="form-range" id="maxSlippage" type="range" min="0.1" max="5" step="0.1" value="0.5"><div class="d-flex justify-content-between text-secondary" style="font-size:.7rem"><span>0.1%</span><span>5.0%</span></div></div>
             <div class="notice mb-3" id="tradePreview">Estimated notional: $12.40 · Demo estimate only.</div>
@@ -127,7 +127,6 @@
     personal:{label:"did:w4:trader:88ba",vault:cloneVault()},
     "zk-shadow":{label:"did:w4:blind:301x",vault:{W4:{balance:180,price:1.24,prefix:"⎔"},WETH:{balance:0.35,price:2840.50,prefix:"Ξ"},ZKP:{balance:42,price:8.75,prefix:"🛡"}}}
   };
-  const seedIntents = [];
   const seedIntents = [
     {id:"w4-intent-77a",profile:"personal",asset:"W4",dir:"BUY",qty:500,state:"Matching",slippage:0.5},
     {id:"w4-intent-12f",profile:"personal",asset:"ZKP",dir:"SELL",qty:25,state:"Awaiting Approval",slippage:0.5},
@@ -244,7 +243,6 @@
     const activeVault=profiles[intent.profile].vault;
     const amount=intent.qty,symbol=intent.asset,price=initialVault[symbol]?.price;
     if(symbol==="W4"||!Number.isFinite(price)){intent.state="Failed";log("Intent "+id+" failed: unsupported quote-asset trade.");refresh();return;}
-    const amount=intent.qty,symbol=intent.asset,price=initialVault[symbol].price;
     if(intent.dir==="SELL"&&activeVault[symbol].balance<amount){intent.state="Failed";log("Intent "+id+" failed: insufficient balance at approval.");refresh();return;}
     const estimatedImpact=amount*price*(intent.slippage/100);
     if(intent.dir==="SELL"){activeVault[symbol].balance-=amount;activeVault.W4.balance+=amount*price/initialVault.W4.price;}
