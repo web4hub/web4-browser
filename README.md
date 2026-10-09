@@ -37,12 +37,3 @@ See [`docs/web4-identity-wallet-lifecycle.md`](docs/web4-identity-wallet-lifecyc
 ## Validation
 
 The GitHub Actions workflow `validate-browser.yml` checks required entry-point controls and validates the inline JavaScript syntax. These static checks do not replace browser-based interaction tests or security review.
-
-
-## Unified workspace
-
-Open the [Web4 Workspace](static/workspace.html) for the expanded responsive prototype covering identity/profile, an AI-style command center, local page generation, community chat preview, AI radio with browser speech, podcasts, currency tools, paper-note mockups, and automation drafts.
-
-All new workspace features are clearly marked as local prototypes. They do not authenticate users, connect users to a shared chat, call a remote AI model, publish pages, run background automations, play a live radio stream, or move real funds. The production integration plan and proposed API boundaries are in [docs/WEB4_PLATFORM_ARCHITECTURE.md](docs/WEB4_PLATFORM_ARCHITECTURE.md).
-
-The workspace uses bundled FX rates strictly for demonstration. Do not use the values for financial decisions. The existing static/fiat-gateway.html and static/marketplace.html remain local simulations.
