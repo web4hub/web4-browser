@@ -1,0 +1,74 @@
+name: Validate Web4 Browser
+
+on:
+  push:
+    branches: [main, "fix/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate browser entry points and inline JavaScript
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import re
+
+          required = {
+              "index.html": ["tabs", "navigateForm", "address", "back", "forward", "reload", "profileSelect", "viewport"],
+              "static/marketplace.html": ["traderProfile", "intentForm", "tradeAmount", "intentTableBody", "activityLog"],
+          }
+
+          class Checker(HTMLParser):
+              def __init__(self):
+                  super().__init__(convert_charrefs=True)
+                  self.ids = set()
+                  self.errors = []
+              def handle_starttag(self, tag, attrs):
+                  for key, value in attrs:
+                      if key == "id" and value:
+                          if value in self.ids:
+                              self.errors.append("duplicate id: " + value)
+                          self.ids.add(value)
+
+          for filename, ids in required.items():
+              path = Path(filename)
+              if not path.is_file():
+                  raise SystemExit(f"Missing required file: {filename}")
+              html = path.read_text(encoding="utf-8")
+              parser = Checker()
+              parser.feed(html)
+              parser.close()
+              missing = sorted(set(ids) - parser.ids)
+              if missing:
+                  raise SystemExit(f"{filename}: missing required IDs: {', '.join(missing)}")
+              if parser.errors:
+                  raise SystemExit(f"{filename}: " + "; ".join(parser.errors))
+              scripts = re.findall(r"<script\\b(?![^>]*\\bsrc=)[^>]*>(.*?)</script\\s*>", html, re.I | re.S)
+              if not scripts:
+                  raise SystemExit(f"{filename}: no inline script found")
+              for index, script in enumerate(scripts):
+                  output = Path("/tmp") / (path.stem.replace(".", "_") + f"-{index}.js")
+                  output.write_text(script, encoding="utf-8")
+                  print(f"Prepared JavaScript syntax check: {filename} -> {output}")
+              print(f"HTML structure checks passed: {filename}")
+          PY
+          for script in /tmp/index-*.js /tmp/marketplace-*.js; do
+            [ -f "$script" ] || continue
+            node --check "$script"
+          done
+          echo "Static validation passed."
