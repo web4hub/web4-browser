@@ -236,7 +236,8 @@
   function settleIntent(id){
     const intent=intents.find(i=>i.id===id);if(!intent||intent.profile!==profileKey()||intent.state!=="Awaiting Approval")return;
     const activeVault=profiles[intent.profile].vault;
-    const amount=intent.qty,symbol=intent.asset,price=initialVault[intent.asset]?.price;\n    if(symbol==="W4"||!Number.isFinite(price)){intent.state="Failed";log("Intent "+id+" failed: unsupported quote-asset trade.");refresh();return;}
+    const amount=intent.qty,symbol=intent.asset,price=initialVault[intent.asset]?.price;
+    if(symbol==="W4"||!Number.isFinite(price)){intent.state="Failed";log("Intent "+id+" failed: unsupported quote-asset trade.");refresh();return;}
     if(intent.dir==="SELL"&&activeVault[symbol].balance<amount){intent.state="Failed";log("Intent "+id+" failed: insufficient balance at approval.");refresh();return;}
     const estimatedImpact=amount*price*(intent.slippage/100);
     if(intent.dir==="SELL"){activeVault[symbol].balance-=amount;activeVault.W4.balance+=amount*price/initialVault.W4.price;}
