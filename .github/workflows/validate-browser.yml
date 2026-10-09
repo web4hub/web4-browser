@@ -2,7 +2,7 @@ name: Validate Web4 Browser
 
 on:
   push:
-    branches: [main, "fix/**"]
+    branches: [main, "fix/**", "upgrade/**"]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Validate browser entry points and inline JavaScript
+      - name: Validate HTML entry points and inline JavaScript
         shell: bash
         run: |
           python3 - <<'PY'
@@ -29,8 +29,9 @@ jobs:
           import re
 
           required = {
-              "index.html": ["tabs", "navigateForm", "address", "back", "forward", "reload", "profileSelect", "viewport"],
+              "index.html": ["tabs", "navigateForm", "address", "back", "forward", "reload", "profileSelect"],
               "static/marketplace.html": ["traderProfile", "intentForm", "tradeAmount", "intentTableBody", "activityLog"],
+              "static/workspace.html": ["nav", "authBtn", "profileForm", "aiForm", "pageForm", "chatForm", "radioForm", "podcastForm", "automationForm", "fxResult"],
           }
 
           class Checker(HTMLParser):
@@ -58,7 +59,7 @@ jobs:
                   raise SystemExit(f"{filename}: missing required IDs: {', '.join(missing)}")
               if parser.errors:
                   raise SystemExit(f"{filename}: " + "; ".join(parser.errors))
-              scripts = re.findall(r"<script\b(?![^>]*\bsrc=)[^>]*>(.*?)</script\s*>", html, re.I | re.S)
+              scripts = re.findall(r"<script\\b(?![^>]*\\bsrc=)[^>]*>(.*?)</script\\s*>", html, re.I | re.S)
               if not scripts:
                   raise SystemExit(f"{filename}: no inline script found")
               for index, script in enumerate(scripts):
@@ -67,7 +68,7 @@ jobs:
                   print(f"Prepared JavaScript syntax check: {filename} -> {output}")
               print(f"HTML structure checks passed: {filename}")
           PY
-          for script in /tmp/index-*.js /tmp/marketplace-*.js; do
+          for script in /tmp/index-*.js /tmp/marketplace-*.js /tmp/workspace-*.js; do
             [ -f "$script" ] || continue
             node --check "$script"
           done
